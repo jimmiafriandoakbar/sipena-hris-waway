@@ -1,0 +1,23 @@
+php artisan serve
+npm run dev
+
+> User::create([
+.     'name' => 'Admin SIPENA',
+.     'email' => 'admin@sipena.com',
+.     'password' => Hash::make('12345678'),
+.     'role' => 'admin'
+. ]);
+
+$user = User::create([
+    'name' => 'Jimmi Afriando Akbar',
+    'email' => 'jimmi@gmail.com',
+    'password' => Hash::make('12345678'),
+    'role' => 'pegawai'
+]);
+
+$user = User::create([
+    'name' => 'Wahyu Pratama',
+    'email' => 'wahyu@gmail.com',
+    'password' => Hash::make('12345678'),
+    'role' => 'pegawai'
+]);

@@ -48,7 +48,7 @@
 
                 @if(!$absensiHariIni)
 
-                <form method="POST" action="{{ route('pegawai.absensi.checkin') }}">
+                <form id="formCheckIn" method="POST" action="{{ route('pegawai.absensi.checkin') }}">
                     @csrf
 
                     <input type="hidden" name="latitude" id="latitude_masuk">
@@ -95,7 +95,7 @@
                         </div>
                     </div>
 
-                    <button type="submit"
+                    <button type="button" onclick="document.getElementById('formCheckIn').submit()"
                         class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition">
                         Check-in Sekarang
                     </button>
@@ -114,7 +114,7 @@
                     </p>
                 </div>
 
-                <form method="POST" action="{{ route('pegawai.absensi.checkout') }}">
+                <form id="formCheckOut" method="POST" action="{{ route('pegawai.absensi.checkout') }}">
                     @csrf
 
                     <input type="hidden" name="latitude" id="latitude_pulang">
@@ -161,7 +161,7 @@
                         </div>
                     </div>
 
-                    <button type="submit"
+                    <button type="button" onclick="document.getElementById('formCheckOut').submit()"
                         class="w-full px-5 py-4 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-700 transition">
                         Check-out Sekarang
                     </button>

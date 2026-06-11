@@ -95,7 +95,7 @@
                         </div>
                     </div>
 
-                    <button type="button" onclick="this.closest('form').submit()"
+                    <button type="submit"
                         class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition">
                         Check-in Sekarang
                     </button>
@@ -161,7 +161,7 @@
                         </div>
                     </div>
 
-                    <button type="button" onclick="this.closest('form').submit()"
+                    <button type="submit"
                         class="w-full px-5 py-4 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-700 transition">
                         Check-out Sekarang
                     </button>
@@ -422,5 +422,17 @@
     }
 
     startCamera();
+
+    const formCheckIn = document.getElementById('formCheckIn');
+
+if (formCheckIn) {
+    formCheckIn.addEventListener('submit', function(e) {
+        if (fotoMasuk && fotoMasuk.value === '') {
+            e.preventDefault();
+            alert('Silakan ambil foto terlebih dahulu.');
+            return false;
+        }
+    });
+}
 </script>
 @endsection

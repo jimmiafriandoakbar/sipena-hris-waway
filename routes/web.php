@@ -223,14 +223,6 @@ Route::prefix('pegawai')->name('pegawai.')->middleware(['auth','role:pegawai'])-
     Route::post('/absensi/check-out', [AbsensiController::class, 'checkOut'])
         ->name('absensi.checkout');
 
-    Route::get('/absensi/check-in', function () {
-        return redirect()->route('pegawai.absensi.index');
-    });
-
-    Route::get('/absensi/check-out', function () {
-        return redirect()->route('pegawai.absensi.index');
-    });
-
     Route::get('/detail-gaji', function () {
     return view('pegawai.detail_gaji');
 })->name('detail.gaji');

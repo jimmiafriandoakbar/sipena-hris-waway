@@ -48,7 +48,7 @@
 
                 @if(!$absensiHariIni)
 
-                <form id="formCheckIn" method="POST" action="{{ route('pegawai.absensi.checkin') }}">
+                <form id="formCheckIn" method="POST" action="{{ route('pegawai.absensi.checkin', [], false) }}">
                     @csrf
 
                     <input type="hidden" name="latitude" id="latitude_masuk">
@@ -114,7 +114,7 @@
                     </p>
                 </div>
 
-                <form id="formCheckOut" method="POST" action="{{ route('pegawai.absensi.checkout') }}">
+                <form id="formCheckOut" method="POST" action="{{ route('pegawai.absensi.checkout', [], false) }}">
                     @csrf
 
                     <input type="hidden" name="latitude" id="latitude_pulang">

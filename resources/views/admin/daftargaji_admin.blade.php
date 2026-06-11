@@ -99,10 +99,10 @@
                 </div>
 
                 <!-- EXPORT -->
-                <a href="{{ route('admin.gaji.print') }}" target="_blank"
-                class="px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700">
-                    Print PDF
-                </a>
+                    <a href="{{ route('admin.gaji.print') }}" target="_blank"
+                    class="px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700">
+                        Print PDF
+                    </a>
 
                 <a href="{{ route('admin.gaji.export') }}"
                     class="h-12 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700

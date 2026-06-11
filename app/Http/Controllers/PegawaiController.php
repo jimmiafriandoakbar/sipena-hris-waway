@@ -357,4 +357,9 @@ public function cuti()
     return view('pegawai.cuti_form', compact('bagian', 'pegawai'));
 }
 
+public function absensis()
+{
+    return $this->hasMany(Absensi::class);
+}
+
 }

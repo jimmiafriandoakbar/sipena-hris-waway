@@ -55,4 +55,10 @@ public function payroll()
 {
     return $this->hasOne(Payroll::class);
 }
+
+public function absensis()
+{
+    return $this->hasMany(Absensi::class);
+}
+
 }

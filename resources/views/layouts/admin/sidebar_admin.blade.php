@@ -54,6 +54,11 @@
                     class="block px-4 py-2 hover:bg-slate-600 transition">
                     Jabatan
                 </a>
+
+                <a href="{{ route('admin.absensi.setting') }}"
+                    class="block px-4 py-2 hover:bg-slate-600 transition">
+                    Parameter Absensi
+                </a>
             </div>
         </div>
 
@@ -65,6 +70,11 @@
         <a href="{{ route('admin.daftargaji_admin') }}" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800 transition">
             <i data-lucide="send"></i>
             <span>Daftar Gaji</span>
+        </a>
+
+        <a href="{{ route('admin.absensi.rekap') }}" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800 transition">
+            <i data-lucide="calendar-check"></i>
+            <span>Rekap Absensi</span>
         </a>
 
     </nav>

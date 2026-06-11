@@ -10,6 +10,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CutiController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\AbsensiSettingController;
 
 
 Route::get('/', function () {
@@ -92,6 +94,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','role:admin'])->group
 
     Route::put('/pegawai/update/{id}', [PegawaiController::class, 'update'])
         ->name('pegawai.update');
+    
+    Route::get('/absensi-setting',[AbsensiSettingController::class, 'index'])
+        ->name('absensi.setting');
+
+    Route::post('/absensi-setting/update',[AbsensiSettingController::class, 'update'])
+        ->name('absensi.setting.update');
+
+    Route::get('/absensi/rekap', [AbsensiController::class, 'rekapAdmin'])
+        ->name('absensi.rekap');
+    
+    Route::get('/absensi/detail/{pegawai}', [AbsensiController::class, 'detailAdmin'])
+        ->name('absensi.detail');
+
 });
 
 Route::prefix('pegawai')->name('pegawai.')->middleware(['auth','role:pegawai'])->group(function () {
@@ -197,6 +212,16 @@ Route::prefix('pegawai')->name('pegawai.')->middleware(['auth','role:pegawai'])-
 
     Route::get('/print-cuti/{id}', [CutiController::class, 'printCuti']
     )->name('print.cuti');
+
+    // ABSENSI PEGAWAI
+    Route::get('/absensi', [AbsensiController::class, 'indexPegawai'])
+        ->name('absensi.index');
+
+    Route::post('/absensi/check-in', [AbsensiController::class, 'checkIn'])
+        ->name('absensi.checkin');
+
+    Route::post('/absensi/check-out', [AbsensiController::class, 'checkOut'])
+        ->name('absensi.checkout');
 
     Route::get('/detail-gaji', function () {
     return view('pegawai.detail_gaji');

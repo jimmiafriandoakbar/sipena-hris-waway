@@ -32,6 +32,12 @@
             <span>Dashboard</span>
         </a>
 
+        <a href="{{ route('pegawai.absensi.index') }}"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800 transitio">
+            <i data-lucide="clock"></i>
+            <span>Absensi</span>
+        </a>
+
         <!-- APPROVAL -->
         <div class="relative">
             <button onclick="toggleDropdown('dropdownApproval')"

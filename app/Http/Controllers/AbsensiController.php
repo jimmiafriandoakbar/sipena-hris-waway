@@ -84,7 +84,7 @@ class AbsensiController extends Controller
         $request->validate([
             'latitude' => 'nullable',
             'longitude' => 'nullable',
-            //'foto_masuk' => 'required|string',
+            'foto_masuk' => 'required|string',
         ]);
 
         $pegawai = Pegawai::where('user_id', Auth::id())->firstOrFail();

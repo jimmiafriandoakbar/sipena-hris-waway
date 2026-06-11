@@ -95,7 +95,7 @@
                         </div>
                     </div>
 
-                    <button type="submit"
+                    <button type="button" onclick="this.closest('form').submit()"
                         class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition">
                         Check-in Sekarang
                     </button>
@@ -161,7 +161,7 @@
                         </div>
                     </div>
 
-                    <button type="submit"
+                    <button type="button" onclick="this.closest('form').submit()"
                         class="w-full px-5 py-4 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-700 transition">
                         Check-out Sekarang
                     </button>

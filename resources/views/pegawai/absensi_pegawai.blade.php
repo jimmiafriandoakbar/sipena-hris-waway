@@ -389,7 +389,7 @@
                 canvas.height
             );
 
-            const imageData = canvas.toDataURL('image/png');
+            const imageData = canvas.toDataURL('image/jpeg', 0.5);
 
             if (fotoMasuk) fotoMasuk.value = imageData;
             if (fotoPulang) fotoPulang.value = imageData;

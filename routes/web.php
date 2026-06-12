@@ -267,5 +267,20 @@ Route::get('/clear-all', function () {
     return 'CLEAR OK';
 });
 
+Route::get('/cek-route-absensi', function () {
+    return collect(Route::getRoutes())
+        ->filter(function ($route) {
+            return str_contains($route->uri(), 'absensi');
+        })
+        ->map(function ($route) {
+            return [
+                'method' => $route->methods(),
+                'uri' => $route->uri(),
+                'name' => $route->getName(),
+            ];
+        })
+        ->values();
+});
+
 require __DIR__.'/auth.php';
 

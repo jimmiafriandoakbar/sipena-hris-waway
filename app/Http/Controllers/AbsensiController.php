@@ -96,7 +96,7 @@ class AbsensiController extends Controller
 
     return redirect()
         ->route('pegawai.absensi.index')
-        ->with('success', 'TEST: Data berhasil masuk DB.');
+        ->with('success', 'TEST CHECKIN BERHASIL MASUK DB.');
 }
 
     public function checkOut(Request $request)

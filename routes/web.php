@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AbsensiSettingController;
+use Illuminate\Support\Facades\Artisan;
 
 
 Route::get('/', function () {
@@ -222,6 +223,19 @@ Route::prefix('pegawai')->name('pegawai.')->middleware(['auth','role:pegawai'])-
 
     Route::post('/absensi/check-out', [AbsensiController::class, 'checkOut'])
         ->name('absensi.checkout');
+
+    Route::get('/absensi/check-in', function () {
+        return redirect()->route('pegawai.absensi.index');
+    })->name('absensi.checkin.get');
+
+    Route::get('/absensi/check-out', function () {
+        return redirect()->route('pegawai.absensi.index');
+    })->name('absensi.checkout.get');
+
+    Route::get('/clear-all', function () {
+        Artisan::call('optimize:clear');
+        return 'OK';
+    });
 
     Route::get('/detail-gaji', function () {
     return view('pegawai.detail_gaji');

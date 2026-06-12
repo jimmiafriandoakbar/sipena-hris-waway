@@ -90,6 +90,7 @@ class AbsensiController extends Controller
 
     public function checkIn(Request $request)
 {
+    die('CHECKIN MASUK HOSTING');
     Log::info('CHECKIN MASUK', $request->all());
 
     $request->validate([

@@ -14,7 +14,7 @@ use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AbsensiSettingController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 
 
 Route::get('/', function () {
@@ -280,6 +280,14 @@ Route::get('/cek-route-absensi', function () {
             ];
         })
         ->values();
+});
+
+Route::get('/cek-db-aktif', function () {
+    return [
+        'database' => DB::connection()->getDatabaseName(),
+        'total_absensis' => DB::table('absensis')->count(),
+        'last_absensi' => DB::table('absensis')->orderByDesc('id')->first(),
+    ];
 });
 
 require __DIR__.'/auth.php';

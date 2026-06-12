@@ -80,92 +80,24 @@ class AbsensiController extends Controller
     }
 
     public function checkIn(Request $request)
-    {
-        $request->validate([
-            'latitude' => 'nullable',
-            'longitude' => 'nullable',
-            'foto_masuk' => 'nullable|string',
-        ]);
+{
+    $pegawai = Pegawai::where('user_id', Auth::id())->firstOrFail();
 
-        $pegawai = Pegawai::where('user_id', Auth::id())->firstOrFail();
-        $setting = AbsensiSetting::first();
+    Absensi::create([
+        'pegawai_id' => $pegawai->id,
+        'tanggal' => now()->toDateString(),
+        'nama_hari' => now()->translatedFormat('l'),
+        'jam_masuk' => now()->format('H:i:s'),
+        'status_masuk' => 'hadir',
+        'menit_terlambat' => 0,
+        'ip_address' => $request->ip(),
+        'device' => $request->userAgent(),
+    ]);
 
-        if (!$setting) {
-            return back()->with('error', 'Parameter absensi belum diatur admin.');
-        }
-
-        $sudahAbsen = Absensi::where('pegawai_id', $pegawai->id)
-            ->whereDate('tanggal', today())
-            ->first();
-
-        if ($sudahAbsen) {
-            return back()->with('error', 'Anda sudah melakukan check-in hari ini.');
-        }
-
-        $now = Carbon::now();
-
-        $batasMasuk = Carbon::parse($setting->jam_masuk)
-            ->addMinutes($setting->toleransi_terlambat);
-
-        $statusMasuk = $now->format('H:i:s') <= $batasMasuk->format('H:i:s')
-            ? 'hadir'
-            : 'terlambat';
-
-        $menitTerlambat = 0;
-
-        if ($statusMasuk === 'terlambat') {
-            $jamNormal = Carbon::parse($setting->jam_masuk);
-            $menitTerlambat = $jamNormal->diffInMinutes($now);
-        }
-
-        $jarakMasuk = $this->hitungJarakMeter(
-            $request->latitude,
-            $request->longitude,
-            $setting->latitude_kantor,
-            $setting->longitude_kantor
-        );
-
-        $validLokasiMasuk = true;
-
-        if ($setting->wajib_lokasi) {
-            if ($jarakMasuk === null) {
-                return back()->with('error', 'Lokasi GPS tidak terdeteksi. Aktifkan lokasi terlebih dahulu.');
-            }
-
-            if ($jarakMasuk > $setting->radius_absensi) {
-                return back()->with('error', 'Anda berada di luar radius absensi. Jarak Anda: ' . $jarakMasuk . ' meter.');
-            }
-        }
-
-        $fotoMasuk = 'test.jpg';
-
-        if (!$fotoMasuk) {
-            return back()->with('error', 'Foto masuk gagal disimpan. Silakan ambil foto ulang.');
-        }
-
-        Absensi::create([
-            'pegawai_id' => $pegawai->id,
-            'tanggal' => today(),
-            'nama_hari' => $now->translatedFormat('l'),
-
-            'jam_masuk' => $now->format('H:i:s'),
-
-            'latitude_masuk' => $request->latitude,
-            'longitude_masuk' => $request->longitude,
-            'jarak_masuk' => $jarakMasuk,
-            'valid_lokasi_masuk' => $validLokasiMasuk,
-
-            'foto_masuk' => $fotoMasuk,
-
-            'status_masuk' => $statusMasuk,
-            'menit_terlambat' => $menitTerlambat,
-
-            'ip_address' => $request->ip(),
-            'device' => $request->userAgent(),
-        ]);
-
-        return back()->with('success', 'Check-in berhasil.');
-    }
+    return redirect()
+        ->route('pegawai.absensi.index')
+        ->with('success', 'TEST: Data berhasil masuk DB.');
+}
 
     public function checkOut(Request $request)
     {

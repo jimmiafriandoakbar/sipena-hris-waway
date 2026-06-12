@@ -334,5 +334,15 @@ Route::match(['get', 'post'], '/absensi/check-in', function (Request $request) {
         ->with('success', 'ROUTE LANGSUNG INSERT OK');
 })->name('absensi.checkin');
 
+Route::post('/test-post', function (Illuminate\Http\Request $request) {
+
+    file_put_contents(
+        storage_path('logs/test_post.txt'),
+        json_encode($request->all(), JSON_PRETTY_PRINT)
+    );
+
+    return 'POST MASUK';
+});
+
 require __DIR__.'/auth.php';
 

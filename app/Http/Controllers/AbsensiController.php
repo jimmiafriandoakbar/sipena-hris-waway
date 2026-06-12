@@ -146,6 +146,14 @@ class AbsensiController extends Controller
             return back()->with('error', 'Foto masuk gagal disimpan. Silakan ambil foto ulang.');
         }
 
+        dd([
+    'request' => $request->all(),
+    'pegawai' => $pegawai,
+    'setting' => $setting,
+    'jarakMasuk' => $jarakMasuk,
+    'fotoMasuk' => $fotoMasuk,
+]);
+
         Absensi::create([
             'pegawai_id' => $pegawai->id,
             'tanggal' => today(),

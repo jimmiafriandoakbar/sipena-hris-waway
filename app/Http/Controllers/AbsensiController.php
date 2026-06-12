@@ -79,8 +79,12 @@ class AbsensiController extends Controller
         return round($earthRadius * $c, 2);
     }
 
+    
+
     public function checkIn(Request $request)
     {
+        dd('MASUK CONTROLLER CHECKIN');
+        
         $request->validate([
             'latitude' => 'nullable',
             'longitude' => 'nullable',

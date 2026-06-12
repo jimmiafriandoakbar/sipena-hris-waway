@@ -305,5 +305,14 @@ Route::get('/test-insert-absensi', function () {
     return 'INSERT OK';
 });
 
+Route::get('/cek-pegawai-login', function () {
+    $pegawai = \App\Models\Pegawai::where('user_id', auth()->id())->first();
+
+    return [
+        'user_id' => auth()->id(),
+        'pegawai' => $pegawai,
+    ];
+})->middleware('auth');
+
 require __DIR__.'/auth.php';
 

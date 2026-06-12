@@ -14,6 +14,26 @@
             </p>
         </div>
 
+        @if ($errors->any())
+    <div class="mb-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 font-semibold">
+        @foreach ($errors->all() as $error)
+            <div>{{ $error }}</div>
+        @endforeach
+    </div>
+@endif
+
+@if(session('success'))
+    <div class="mb-4 p-4 rounded-2xl bg-green-50 border border-green-200 text-green-700 font-semibold">
+        {{ session('success') }}
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="mb-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 font-semibold">
+        {{ session('error') }}
+    </div>
+@endif
+
         @if(session('success'))
         <div class="mb-4 p-4 rounded-2xl bg-green-50 border border-green-200 text-green-700 font-semibold">
             {{ session('success') }}

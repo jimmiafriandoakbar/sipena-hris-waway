@@ -103,7 +103,9 @@ Route::prefix('pegawai')->name('pegawai.')->middleware(['auth','role:pegawai'])-
     Route::get('/print-cuti/{id}', [CutiController::class, 'printCuti'])->name('print.cuti');
 
     Route::get('/absensi', [AbsensiController::class, 'indexPegawai'])->name('absensi.index');
-    Route::post('/absensi/check-in', [AbsensiController::class, 'checkIn'])->name('absensi.checkin');
+    Route::post('/absensi/check-in', function () {
+    die('ROUTE CHECKIN MASUK');
+})->name('absensi.checkin');
     Route::post('/absensi/check-out', [AbsensiController::class, 'checkOut'])->name('absensi.checkout');
 
     Route::get('/absensi/check-in', function () {

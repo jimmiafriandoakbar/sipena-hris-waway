@@ -314,5 +314,25 @@ Route::get('/cek-pegawai-login', function () {
     ];
 })->middleware('auth');
 
+Route::match(['get', 'post'], '/absensi/check-in', function (Request $request) {
+    if ($request->isMethod('get')) {
+        return redirect()->route('pegawai.absensi.index');
+    }
+
+    DB::table('absensis')->insert([
+        'pegawai_id' => 1,
+        'tanggal' => now()->toDateString(),
+        'nama_hari' => now()->translatedFormat('l'),
+        'jam_masuk' => now()->format('H:i:s'),
+        'status_masuk' => 'hadir',
+        'menit_terlambat' => 0,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    return redirect()->route('pegawai.absensi.index')
+        ->with('success', 'ROUTE LANGSUNG INSERT OK');
+})->name('absensi.checkin');
+
 require __DIR__.'/auth.php';
 

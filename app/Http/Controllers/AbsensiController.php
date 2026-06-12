@@ -84,7 +84,7 @@ class AbsensiController extends Controller
         $request->validate([
             'latitude' => 'nullable',
             'longitude' => 'nullable',
-            'foto_masuk' => 'required|string',
+            'foto_masuk' => 'nullable|string',
         ]);
 
         $pegawai = Pegawai::where('user_id', Auth::id())->firstOrFail();
@@ -137,10 +137,7 @@ class AbsensiController extends Controller
             }
         }
 
-        $fotoMasuk = $this->simpanFotoBase64(
-            $request->foto_masuk,
-            'absensi/foto_masuk'
-        );
+        $fotoMasuk = 'test.jpg';
 
         if (!$fotoMasuk) {
             return back()->with('error', 'Foto masuk gagal disimpan. Silakan ambil foto ulang.');

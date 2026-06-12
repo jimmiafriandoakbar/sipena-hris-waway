@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class AbsensiController extends Controller
 {
@@ -165,6 +166,8 @@ class AbsensiController extends Controller
                 ->with('error', 'Foto masuk gagal disimpan. Kecilkan ukuran foto / cek permission storage.');
         }
 
+        Log::info('CHECKIN MASUK', $request->all());
+
         Absensi::create([
             'pegawai_id' => $pegawai->id,
             'tanggal' => now()->toDateString(),
@@ -185,6 +188,8 @@ class AbsensiController extends Controller
             'ip_address' => $request->ip(),
             'device' => $request->userAgent(),
         ]);
+
+        Log::info('SIAP INSERT');
 
         return redirect()
             ->route('pegawai.absensi.index')

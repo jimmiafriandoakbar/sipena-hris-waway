@@ -422,5 +422,28 @@
     }
 
     startCamera();
+
+    document.querySelectorAll('form').forEach(form => {
+
+    form.addEventListener('submit', function(e) {
+
+        const fotoMasuk = document.getElementById('foto_masuk');
+        const fotoPulang = document.getElementById('foto_pulang');
+
+        const foto =
+            (fotoMasuk ? fotoMasuk.value : '') ||
+            (fotoPulang ? fotoPulang.value : '');
+
+        if (!foto) {
+            e.preventDefault();
+            alert('Silakan ambil foto terlebih dahulu.');
+            return;
+        }
+
+        console.log('PANJANG FOTO : ', foto.length);
+        console.log('FORM SUBMIT');
+    });
+
+});
 </script>
 @endsection

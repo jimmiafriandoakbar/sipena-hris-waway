@@ -83,8 +83,6 @@ class AbsensiController extends Controller
 
     public function checkIn(Request $request)
     {
-        dd('MASUK CONTROLLER CHECKIN');
-        
         $request->validate([
             'latitude' => 'nullable',
             'longitude' => 'nullable',
@@ -179,7 +177,9 @@ class AbsensiController extends Controller
             'device' => $request->userAgent(),
         ]);
 
-        return back()->with('success', 'Check-in berhasil.');
+        return redirect()
+        ->route('pegawai.absensi.index')
+        ->with('success', 'Check-in berhasil.');
     }
 
     public function checkOut(Request $request)

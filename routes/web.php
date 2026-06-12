@@ -13,6 +13,8 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AbsensiSettingController;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Http\Request;
+
 
 
 Route::get('/', function () {
@@ -214,28 +216,24 @@ Route::prefix('pegawai')->name('pegawai.')->middleware(['auth','role:pegawai'])-
     Route::get('/print-cuti/{id}', [CutiController::class, 'printCuti']
     )->name('print.cuti');
 
-    // ABSENSI PEGAWAI
     Route::get('/absensi', [AbsensiController::class, 'indexPegawai'])
-        ->name('absensi.index');
+    ->name('absensi.index');
 
-    Route::post('/absensi/check-in', [AbsensiController::class, 'checkIn'])
-        ->name('absensi.checkin');
-
-    Route::post('/absensi/check-out', [AbsensiController::class, 'checkOut'])
-        ->name('absensi.checkout');
-
-    Route::get('/absensi/check-in', function () {
+Route::match(['get', 'post'], '/absensi/check-in', function (Request $request) {
+    if ($request->isMethod('get')) {
         return redirect()->route('pegawai.absensi.index');
-    })->name('absensi.checkin.get');
+    }
 
-    Route::get('/absensi/check-out', function () {
+    return app(AbsensiController::class)->checkIn($request);
+})->name('absensi.checkin');
+
+Route::match(['get', 'post'], '/absensi/check-out', function (Request $request) {
+    if ($request->isMethod('get')) {
         return redirect()->route('pegawai.absensi.index');
-    })->name('absensi.checkout.get');
+    }
 
-    Route::get('/clear-all', function () {
-        Artisan::call('optimize:clear');
-        return 'OK';
-    });
+    return app(AbsensiController::class)->checkOut($request);
+})->name('absensi.checkout');
 
     Route::get('/detail-gaji', function () {
     return view('pegawai.detail_gaji');
@@ -259,6 +257,15 @@ Route::post('/admin/update-password', [App\Http\Controllers\AdminController::cla
 
 Route::post('/pegawai/ttd', [ProfileController::class, 'storeTTD'])
     ->name('pegawai.ttd.store');
+
+Route::get('/clear-all', function () {
+    Artisan::call('optimize:clear');
+    Artisan::call('route:clear');
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+
+    return 'CLEAR OK';
+});
 
 require __DIR__.'/auth.php';
 

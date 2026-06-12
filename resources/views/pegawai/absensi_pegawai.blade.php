@@ -138,7 +138,7 @@
                             </video>
                         </div>
 
-                        <canvas id="canvas" width="640" height="480" class="hidden"></canvas>
+                        <canvas id="canvas" width="320" height="240" class="hidden"></canvas>
 
                         <div id="previewFoto" class="hidden mt-4">
                             <p class="font-semibold text-slate-700 mb-2">

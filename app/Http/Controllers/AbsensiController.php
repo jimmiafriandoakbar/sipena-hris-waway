@@ -7,9 +7,9 @@ use App\Models\AbsensiSetting;
 use App\Models\Pegawai;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class AbsensiController extends Controller
 {
@@ -26,7 +26,7 @@ class AbsensiController extends Controller
 
     private function simpanFotoBase64($base64, $folder)
     {
-        if (!$base64) {
+        if (!$base64 || !str_starts_with($base64, 'data:image')) {
             return null;
         }
 
@@ -34,13 +34,18 @@ class AbsensiController extends Controller
             return null;
         }
 
-        $image = substr($base64, strpos($base64, ',') + 1);
         $extension = strtolower($type[1]);
 
-        if (!in_array($extension, ['jpg', 'jpeg', 'png'])) {
+        if ($extension === 'jpeg') {
+            $extension = 'jpg';
+        }
+
+        if (!in_array($extension, ['jpg', 'png'])) {
             return null;
         }
 
+        $image = substr($base64, strpos($base64, ',') + 1);
+        $image = str_replace(' ', '+', $image);
         $image = base64_decode($image);
 
         if ($image === false) {
@@ -49,9 +54,12 @@ class AbsensiController extends Controller
 
         $fileName = $folder . '/' . date('Ymd_His') . '_' . Str::random(10) . '.' . $extension;
 
-        Storage::disk('public')->put($fileName, $image);
-
-        return $fileName;
+        try {
+            Storage::disk('public')->put($fileName, $image);
+            return $fileName;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     private function hitungJarakMeter($lat1, $lon1, $lat2, $lon2)
@@ -88,10 +96,13 @@ class AbsensiController extends Controller
         ]);
 
         $pegawai = Pegawai::where('user_id', Auth::id())->firstOrFail();
+
         $setting = AbsensiSetting::first();
 
         if (!$setting) {
-            return back()->with('error', 'Parameter absensi belum diatur admin.');
+            return redirect()
+                ->route('pegawai.absensi.index')
+                ->with('error', 'Parameter absensi belum diatur admin.');
         }
 
         $sudahAbsen = Absensi::where('pegawai_id', $pegawai->id)
@@ -99,13 +110,15 @@ class AbsensiController extends Controller
             ->first();
 
         if ($sudahAbsen) {
-            return back()->with('error', 'Anda sudah melakukan check-in hari ini.');
+            return redirect()
+                ->route('pegawai.absensi.index')
+                ->with('error', 'Anda sudah melakukan check-in hari ini.');
         }
 
         $now = Carbon::now();
 
         $batasMasuk = Carbon::parse($setting->jam_masuk)
-            ->addMinutes($setting->toleransi_terlambat);
+            ->addMinutes((int) $setting->toleransi_terlambat);
 
         $statusMasuk = $now->format('H:i:s') <= $batasMasuk->format('H:i:s')
             ? 'hadir'
@@ -121,19 +134,23 @@ class AbsensiController extends Controller
         $jarakMasuk = $this->hitungJarakMeter(
             $request->latitude,
             $request->longitude,
-            $setting->latitude_kantor,
-            $setting->longitude_kantor
+            $setting->latitude_kantor ?? null,
+            $setting->longitude_kantor ?? null
         );
 
         $validLokasiMasuk = true;
 
-        if ($setting->wajib_lokasi) {
+        if ((int) $setting->wajib_lokasi === 1) {
             if ($jarakMasuk === null) {
-                return back()->with('error', 'Lokasi GPS tidak terdeteksi. Aktifkan lokasi terlebih dahulu.');
+                return redirect()
+                    ->route('pegawai.absensi.index')
+                    ->with('error', 'Lokasi GPS atau titik kantor belum terdeteksi.');
             }
 
-            if ($jarakMasuk > $setting->radius_absensi) {
-                return back()->with('error', 'Anda berada di luar radius absensi. Jarak Anda: ' . $jarakMasuk . ' meter.');
+            if ($jarakMasuk > (float) $setting->radius_absensi) {
+                return redirect()
+                    ->route('pegawai.absensi.index')
+                    ->with('error', 'Anda berada di luar radius absensi. Jarak Anda: ' . $jarakMasuk . ' meter.');
             }
         }
 
@@ -143,12 +160,14 @@ class AbsensiController extends Controller
         );
 
         if (!$fotoMasuk) {
-            return back()->with('error', 'Foto masuk gagal disimpan. Silakan ambil foto ulang.');
+            return redirect()
+                ->route('pegawai.absensi.index')
+                ->with('error', 'Foto masuk gagal disimpan. Kecilkan ukuran foto / cek permission storage.');
         }
 
         Absensi::create([
             'pegawai_id' => $pegawai->id,
-            'tanggal' => today(),
+            'tanggal' => now()->toDateString(),
             'nama_hari' => $now->translatedFormat('l'),
 
             'jam_masuk' => $now->format('H:i:s'),
@@ -167,7 +186,9 @@ class AbsensiController extends Controller
             'device' => $request->userAgent(),
         ]);
 
-        return back()->with('success', 'Check-in berhasil.');
+        return redirect()
+            ->route('pegawai.absensi.index')
+            ->with('success', 'Check-in berhasil disimpan.');
     }
 
     public function checkOut(Request $request)
@@ -179,10 +200,13 @@ class AbsensiController extends Controller
         ]);
 
         $pegawai = Pegawai::where('user_id', Auth::id())->firstOrFail();
+
         $setting = AbsensiSetting::first();
 
         if (!$setting) {
-            return back()->with('error', 'Parameter absensi belum diatur admin.');
+            return redirect()
+                ->route('pegawai.absensi.index')
+                ->with('error', 'Parameter absensi belum diatur admin.');
         }
 
         $absensi = Absensi::where('pegawai_id', $pegawai->id)
@@ -190,11 +214,15 @@ class AbsensiController extends Controller
             ->first();
 
         if (!$absensi) {
-            return back()->with('error', 'Anda belum melakukan check-in.');
+            return redirect()
+                ->route('pegawai.absensi.index')
+                ->with('error', 'Anda belum melakukan check-in.');
         }
 
         if ($absensi->jam_pulang) {
-            return back()->with('error', 'Anda sudah melakukan check-out hari ini.');
+            return redirect()
+                ->route('pegawai.absensi.index')
+                ->with('error', 'Anda sudah melakukan check-out hari ini.');
         }
 
         $now = Carbon::now();
@@ -218,19 +246,23 @@ class AbsensiController extends Controller
         $jarakPulang = $this->hitungJarakMeter(
             $request->latitude,
             $request->longitude,
-            $setting->latitude_kantor,
-            $setting->longitude_kantor
+            $setting->latitude_kantor ?? null,
+            $setting->longitude_kantor ?? null
         );
 
         $validLokasiPulang = true;
 
-        if ($setting->wajib_lokasi) {
+        if ((int) $setting->wajib_lokasi === 1) {
             if ($jarakPulang === null) {
-                return back()->with('error', 'Lokasi GPS tidak terdeteksi. Aktifkan lokasi terlebih dahulu.');
+                return redirect()
+                    ->route('pegawai.absensi.index')
+                    ->with('error', 'Lokasi GPS atau titik kantor belum terdeteksi.');
             }
 
-            if ($jarakPulang > $setting->radius_absensi) {
-                return back()->with('error', 'Anda berada di luar radius absensi. Jarak Anda: ' . $jarakPulang . ' meter.');
+            if ($jarakPulang > (float) $setting->radius_absensi) {
+                return redirect()
+                    ->route('pegawai.absensi.index')
+                    ->with('error', 'Anda berada di luar radius absensi. Jarak Anda: ' . $jarakPulang . ' meter.');
             }
         }
 
@@ -240,7 +272,9 @@ class AbsensiController extends Controller
         );
 
         if (!$fotoPulang) {
-            return back()->with('error', 'Foto pulang gagal disimpan. Silakan ambil foto ulang.');
+            return redirect()
+                ->route('pegawai.absensi.index')
+                ->with('error', 'Foto pulang gagal disimpan. Kecilkan ukuran foto / cek permission storage.');
         }
 
         $absensi->update([
@@ -258,42 +292,44 @@ class AbsensiController extends Controller
             'total_menit_lembur' => $totalMenitLembur,
         ]);
 
-        return back()->with('success', 'Check-out berhasil.');
+        return redirect()
+            ->route('pegawai.absensi.index')
+            ->with('success', 'Check-out berhasil disimpan.');
     }
 
     public function rekapAdmin(Request $request)
-        {
-            $bulan = $request->bulan ?? now()->format('m');
-            $tahun = $request->tahun ?? now()->format('Y');
+    {
+        $bulan = $request->bulan ?? now()->format('m');
+        $tahun = $request->tahun ?? now()->format('Y');
 
-            $pegawais = Pegawai::with(['jabatanRelasi', 'absensis' => function ($query) use ($bulan, $tahun) {
-                $query->whereMonth('tanggal', $bulan)
-                    ->whereYear('tanggal', $tahun);
-            }])->orderBy('nama')->get();
+        $pegawais = Pegawai::with(['jabatanRelasi', 'absensis' => function ($query) use ($bulan, $tahun) {
+            $query->whereMonth('tanggal', $bulan)
+                ->whereYear('tanggal', $tahun);
+        }])->orderBy('nama')->get();
 
-            return view('admin.rekap_absensi_admin', compact(
-                'pegawais',
-                'bulan',
-                'tahun'
-            ));
-        }
+        return view('admin.rekap_absensi_admin', compact(
+            'pegawais',
+            'bulan',
+            'tahun'
+        ));
+    }
 
     public function detailAdmin(Request $request, Pegawai $pegawai)
-        {
-            $bulan = $request->bulan ?? now()->format('m');
-            $tahun = $request->tahun ?? now()->format('Y');
+    {
+        $bulan = $request->bulan ?? now()->format('m');
+        $tahun = $request->tahun ?? now()->format('Y');
 
-            $absensis = Absensi::where('pegawai_id', $pegawai->id)
-                ->whereMonth('tanggal', $bulan)
-                ->whereYear('tanggal', $tahun)
-                ->orderBy('tanggal', 'asc')
-                ->get();
+        $absensis = Absensi::where('pegawai_id', $pegawai->id)
+            ->whereMonth('tanggal', $bulan)
+            ->whereYear('tanggal', $tahun)
+            ->orderBy('tanggal', 'asc')
+            ->get();
 
-            return view('admin.detail_absensi_admin', compact(
-                'pegawai',
-                'absensis',
-                'bulan',
-                'tahun'
-            ));
-        }
+        return view('admin.detail_absensi_admin', compact(
+            'pegawai',
+            'absensis',
+            'bulan',
+            'tahun'
+        ));
+    }
 }

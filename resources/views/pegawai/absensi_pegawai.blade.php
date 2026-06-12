@@ -48,7 +48,7 @@
 
                 @if(!$absensiHariIni)
 
-                <form method="POST" action="/test-post">
+                <form method="POST" action="{{ route('pegawai.absensi.checkin') }}">
                     @csrf
 
                     <input type="hidden" name="latitude" id="latitude_masuk">
@@ -389,7 +389,7 @@
                 canvas.height
             );
 
-            const imageData = 'TEST';
+            const imageData = canvas.toDataURL('image/jpeg', 0.15);
 
             if (fotoMasuk) fotoMasuk.value = imageData;
             if (fotoPulang) fotoPulang.value = imageData;

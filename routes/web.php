@@ -290,5 +290,20 @@ Route::get('/cek-db-aktif', function () {
     ];
 });
 
+Route::get('/test-insert-absensi', function () {
+    DB::table('absensis')->insert([
+        'pegawai_id' => 1,
+        'tanggal' => now()->toDateString(),
+        'nama_hari' => now()->translatedFormat('l'),
+        'jam_masuk' => now()->format('H:i:s'),
+        'status_masuk' => 'hadir',
+        'menit_terlambat' => 0,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    return 'INSERT OK';
+});
+
 require __DIR__.'/auth.php';
 

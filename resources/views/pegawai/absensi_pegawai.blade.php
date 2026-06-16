@@ -1,6 +1,19 @@
 @extends('layouts.pegawai.app')
 
 @section('content')
+
+@if (session('success'))
+<script>
+    alert("{{ session('success') }}");
+</script>
+@endif
+
+@if (session('error'))
+<script>
+    alert("{{ session('error') }}");
+</script>
+@endif
+
 <div class="p-6 bg-slate-50 min-h-screen">
     <div class="max-w-5xl mx-auto">
 

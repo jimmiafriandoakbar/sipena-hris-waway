@@ -111,6 +111,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','role:admin'])->group
     ->where('path', '.*')
     ->name('absensi.foto');
 
+    Route::get('/absensi/print', [AbsensiController::class, 'printAdmin'])
+    ->name('absensi.print');
+
 });
 
 Route::prefix('pegawai')->name('pegawai.')->middleware(['auth','role:pegawai'])->group(function () {

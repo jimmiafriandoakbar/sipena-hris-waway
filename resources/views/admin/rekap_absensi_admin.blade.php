@@ -73,11 +73,14 @@
             </div>
 
             <div>
-                <button type="button"
-                        onclick="window.print()"
-                        class="w-full px-5 py-3 rounded-xl bg-slate-800 text-white font-semibold hover:bg-slate-900 transition">
-                    Print
-                </button>
+                <a href="{{ route('admin.absensi.print', [
+                        'bulan' => $bulan,
+                        'tahun' => $tahun
+                        ]) }}"
+                    target="_blank"
+                    class="block text-center w-full px-5 py-3 rounded-xl bg-slate-800 text-white font-semibold hover:bg-slate-900 transition">
+                        Print
+                </a>
             </div>
 
         </form>

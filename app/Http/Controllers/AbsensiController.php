@@ -271,5 +271,26 @@ class AbsensiController extends Controller
             );
         }
 
+        public function printAdmin(Request $request)
+{
+    $bulan = $request->bulan ?? now()->format('m');
+    $tahun = $request->tahun ?? now()->year;
+
+    $jumlahHari = \Carbon\Carbon::create($tahun, $bulan, 1)->daysInMonth;
+
+    $pegawais = Pegawai::with(['absensis' => function ($query) use ($bulan, $tahun) {
+        $query->whereMonth('tanggal', $bulan)
+              ->whereYear('tanggal', $tahun);
+    }])
+    ->orderBy('nama')
+    ->get();
+
+    return view('admin.printabsen_admin', compact(
+        'pegawais',
+        'bulan',
+        'tahun',
+        'jumlahHari'
+    ));
+}
 
 }

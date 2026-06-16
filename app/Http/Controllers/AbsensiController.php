@@ -49,6 +49,15 @@ class AbsensiController extends Controller
 
     public function checkIn(Request $request)
     {
+        $request->validate([
+            'latitude' => 'nullable',
+            'longitude' => 'nullable',
+            'foto_masuk' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $fotoMasuk = $request->file('foto_masuk')
+            ->store('absensi/foto_masuk', 'public');
+
         $pegawai = Pegawai::where('user_id', Auth::id())->firstOrFail();
         $setting = AbsensiSetting::first();
 
@@ -111,7 +120,7 @@ class AbsensiController extends Controller
             'jarak_masuk' => $jarakMasuk,
             'valid_lokasi_masuk' => true,
 
-            'foto_masuk' => null,
+            'foto_masuk' => $fotoMasuk,
 
             'status_masuk' => $statusMasuk,
             'menit_terlambat' => $menitTerlambat,

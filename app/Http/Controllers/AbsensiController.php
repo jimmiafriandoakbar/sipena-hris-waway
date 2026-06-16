@@ -97,7 +97,7 @@ class AbsensiController extends Controller
         'device' => $request->userAgent(),
     ]);
 
-    return back()->with('success', 'Check-in berhasil tanpa foto.');
+    return back()->with('success', 'Check-in berhasil masuk DB.');
 }
 
     public function checkOut(Request $request)

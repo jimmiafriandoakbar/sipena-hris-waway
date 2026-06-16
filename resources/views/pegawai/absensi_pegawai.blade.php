@@ -48,7 +48,7 @@
 
                 @if(!$absensiHariIni)
 
-                <form method="POST" action="{{ route('pegawai.absensi.checkin') }}">
+                <form method="POST" action="/pegawai/absensi/check-in-test">
                     @csrf
 
                     <input type="hidden" name="latitude" id="latitude_masuk">

@@ -48,10 +48,57 @@
 
                 @if(!$absensiHariIni)
 
-                <form method="POST" action="/pegawai/absensi/check-in-test">
+                <form method="POST" action="{{ route('pegawai.absensi.checkin') }}">
                     @csrf
-                    <button type="submit" class="bg-blue-600 text-white p-4 rounded">
-                        TEST POST
+
+                    <input type="hidden" name="latitude" id="latitude_masuk">
+                    <input type="hidden" name="longitude" id="longitude_masuk">
+                    <input type="hidden" name="foto_masuk" id="foto_masuk">
+
+                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-slate-700">
+                                Kamera Selfie Masuk
+                            </h3>
+
+                            <span id="lokasiStatus"
+                                class="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">
+                                Mengambil lokasi...
+                            </span>
+                        </div>
+
+                        <div class="relative overflow-hidden rounded-2xl bg-black">
+                            <video id="video" autoplay playsinline muted class="w-full h-[320px] object-cover">
+                            </video>
+                        </div>
+
+                        <canvas id="canvas" width="640" height="480" class="hidden"></canvas>
+
+                        <div id="previewFoto" class="hidden mt-4">
+                            <p class="font-semibold text-slate-700 mb-2">
+                                Preview Foto
+                            </p>
+                            <img id="previewImage"
+                                class="w-40 h-40 object-cover rounded-2xl border border-slate-200 shadow-sm">
+                        </div>
+
+                        <div class="flex flex-wrap gap-3 mt-4">
+                            <button type="button" id="capture"
+                                class="px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
+                                Ambil Foto
+                            </button>
+
+                            <button type="button" id="retake"
+                                class="hidden px-5 py-3 rounded-xl bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 transition">
+                                Foto Ulang
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="button"
+                        onclick="document.getElementById('formCheckin').submit();"
+                        class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold">
+                        Check-in Sekarang
                     </button>
                 </form>
 

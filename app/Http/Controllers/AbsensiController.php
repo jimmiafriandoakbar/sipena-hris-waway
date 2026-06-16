@@ -83,12 +83,12 @@ class AbsensiController extends Controller
     {
 
         dd([
-        'masuk_controller' => true,
-        'latitude' => $request->latitude,
-        'longitude' => $request->longitude,
-        'foto_ada' => !empty($request->foto_masuk),
-        'panjang_foto' => strlen($request->foto_masuk ?? ''),
-    ]);
+    'masuk_controller' => true,
+    'latitude' => $request->latitude,
+    'longitude' => $request->longitude,
+    'foto_ada' => !empty($request->foto_masuk),
+    'panjang_foto' => strlen($request->foto_masuk ?? ''),
+]);
 
         $request->validate([
             'latitude' => 'nullable',

@@ -16,7 +16,7 @@ class AbsensiController extends Controller
         $pegawai = Pegawai::where('user_id', Auth::id())->firstOrFail();
 
         $absensiHariIni = Absensi::where('pegawai_id', $pegawai->id)
-            ->whereDate('tanggal', today())
+            ->whereDate('tanggal', Carbon::now('Asia/Jakarta')->toDateString())
             ->first();
 
         return view('pegawai.absensi_pegawai', compact('pegawai', 'absensiHariIni'));
@@ -55,8 +55,7 @@ class AbsensiController extends Controller
             'foto_masuk' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $fotoMasuk = $request->file('foto_masuk')
-            ->store('absensi/foto_masuk', 'public');
+        $now = Carbon::now('Asia/Jakarta');
 
         $pegawai = Pegawai::where('user_id', Auth::id())->firstOrFail();
         $setting = AbsensiSetting::first();
@@ -66,16 +65,17 @@ class AbsensiController extends Controller
         }
 
         $sudahAbsen = Absensi::where('pegawai_id', $pegawai->id)
-            ->whereDate('tanggal', today())
+            ->whereDate('tanggal', $now->toDateString())
             ->first();
 
         if ($sudahAbsen) {
             return back()->with('error', 'Anda sudah melakukan check-in hari ini.');
         }
 
-        $now = Carbon::now();
+        $fotoMasuk = $request->file('foto_masuk')
+            ->store('absensi/foto_masuk', 'public');
 
-        $batasMasuk = Carbon::parse($setting->jam_masuk)
+        $batasMasuk = Carbon::parse($setting->jam_masuk, 'Asia/Jakarta')
             ->addMinutes((int) $setting->toleransi_terlambat);
 
         $radiusAbsensi = (float) $setting->radius_absensi;
@@ -87,7 +87,7 @@ class AbsensiController extends Controller
         $menitTerlambat = 0;
 
         if ($statusMasuk === 'terlambat') {
-            $menitTerlambat = Carbon::parse($setting->jam_masuk)
+            $menitTerlambat = Carbon::parse($setting->jam_masuk, 'Asia/Jakarta')
                 ->diffInMinutes($now);
         }
 
@@ -110,7 +110,7 @@ class AbsensiController extends Controller
 
         Absensi::create([
             'pegawai_id' => $pegawai->id,
-            'tanggal' => today(),
+            'tanggal' => $now->toDateString(),
             'nama_hari' => $now->translatedFormat('l'),
 
             'jam_masuk' => $now->format('H:i:s'),
@@ -134,6 +134,13 @@ class AbsensiController extends Controller
 
     public function checkOut(Request $request)
     {
+        $request->validate([
+            'latitude' => 'nullable',
+            'longitude' => 'nullable',
+        ]);
+
+        $now = Carbon::now('Asia/Jakarta');
+
         $pegawai = Pegawai::where('user_id', Auth::id())->firstOrFail();
         $setting = AbsensiSetting::first();
 
@@ -142,7 +149,7 @@ class AbsensiController extends Controller
         }
 
         $absensi = Absensi::where('pegawai_id', $pegawai->id)
-            ->whereDate('tanggal', today())
+            ->whereDate('tanggal', $now->toDateString())
             ->first();
 
         if (!$absensi) {
@@ -153,10 +160,8 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda sudah melakukan check-out hari ini.');
         }
 
-        $now = Carbon::now();
-
-        $jamPulang = Carbon::parse($setting->jam_pulang);
-        $jamMulaiLembur = Carbon::parse($setting->jam_mulai_lembur);
+        $jamPulang = Carbon::parse($setting->jam_pulang, 'Asia/Jakarta');
+        $jamMulaiLembur = Carbon::parse($setting->jam_mulai_lembur, 'Asia/Jakarta');
 
         $statusPulang = 'normal';
         $menitPulangCepat = 0;
@@ -178,12 +183,14 @@ class AbsensiController extends Controller
             $setting->longitude_kantor
         );
 
+        $radiusAbsensi = (float) $setting->radius_absensi;
+
         if ($setting->wajib_lokasi) {
             if ($jarakPulang === null) {
                 return back()->with('error', 'Lokasi GPS tidak terdeteksi.');
             }
 
-            if ($jarakPulang > $setting->radius_absensi) {
+            if ($jarakPulang > $radiusAbsensi) {
                 return back()->with('error', 'Anda berada di luar radius absensi. Jarak: ' . $jarakPulang . ' meter.');
             }
         }
@@ -208,8 +215,8 @@ class AbsensiController extends Controller
 
     public function rekapAdmin(Request $request)
     {
-        $bulan = $request->bulan ?? now()->format('m');
-        $tahun = $request->tahun ?? now()->format('Y');
+        $bulan = $request->bulan ?? Carbon::now('Asia/Jakarta')->format('m');
+        $tahun = $request->tahun ?? Carbon::now('Asia/Jakarta')->format('Y');
 
         $pegawais = Pegawai::with(['jabatanRelasi', 'absensis' => function ($query) use ($bulan, $tahun) {
             $query->whereMonth('tanggal', $bulan)
@@ -225,8 +232,8 @@ class AbsensiController extends Controller
 
     public function detailAdmin(Request $request, Pegawai $pegawai)
     {
-        $bulan = $request->bulan ?? now()->format('m');
-        $tahun = $request->tahun ?? now()->format('Y');
+        $bulan = $request->bulan ?? Carbon::now('Asia/Jakarta')->format('m');
+        $tahun = $request->tahun ?? Carbon::now('Asia/Jakarta')->format('Y');
 
         $absensis = Absensi::where('pegawai_id', $pegawai->id)
             ->whereMonth('tanggal', $bulan)

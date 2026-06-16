@@ -9,7 +9,7 @@
                 Absensi Pegawai
             </h1>
             <p class="text-slate-500 mt-1">
-                Check-in dan check-out menggunakan lokasi GPS.
+                Check-in menggunakan kamera selfie dan lokasi GPS.
             </p>
         </div>
 
@@ -35,7 +35,7 @@
                             {{ $pegawai->nama }}
                         </h2>
                         <p class="text-slate-500">
-                            {{ now()->translatedFormat('l, d F Y') }}
+                            {{ now('Asia/Jakarta')->translatedFormat('l, d F Y') }}
                         </p>
                     </div>
 
@@ -48,36 +48,55 @@
                 @if(!$absensiHariIni)
 
                     <form id="formCheckin" method="POST" action="{{ route('pegawai.absensi.checkin') }}">
-    @csrf
+                        @csrf
 
-    <input type="hidden" name="latitude" id="latitude_masuk">
-    <input type="hidden" name="longitude" id="longitude_masuk">
+                        <input type="hidden" name="latitude" id="latitude_masuk">
+                        <input type="hidden" name="longitude" id="longitude_masuk">
 
-    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-5">
-        <h3 class="font-bold text-slate-700 mb-3">Kamera Selfie Masuk</h3>
+                        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-5">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-bold text-slate-700">
+                                    Kamera Selfie Masuk
+                                </h3>
 
-        <div class="relative overflow-hidden rounded-2xl bg-black">
-            <video id="video" autoplay playsinline muted class="w-full h-[320px] object-cover"></video>
-        </div>
+                                <span id="lokasiStatus"
+                                    class="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">
+                                    Mengambil lokasi...
+                                </span>
+                            </div>
 
-        <canvas id="canvas" class="hidden"></canvas>
+                            <div class="relative overflow-hidden rounded-2xl bg-black">
+                                <video id="video" autoplay playsinline muted class="w-full h-[320px] object-cover"></video>
+                            </div>
 
-        <div id="previewFoto" class="hidden mt-4">
-            <p class="font-semibold text-slate-700 mb-2">Preview Foto</p>
-            <img id="previewImage" class="w-40 h-40 object-cover rounded-2xl border">
-        </div>
+                            <canvas id="canvas" class="hidden"></canvas>
 
-        <button type="button" id="capture"
-            class="mt-4 px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold">
-            Ambil Foto
-        </button>
-    </div>
+                            <div id="previewFoto" class="hidden mt-4">
+                                <p class="font-semibold text-slate-700 mb-2">
+                                    Preview Foto
+                                </p>
+                                <img id="previewImage"
+                                    class="w-40 h-40 object-cover rounded-2xl border border-slate-200 shadow-sm">
+                            </div>
 
-    <button type="submit"
-        class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold">
-        Check-in Sekarang
-    </button>
-</form>
+                            <div class="flex flex-wrap gap-3 mt-4">
+                                <button type="button" id="capture"
+                                    class="px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
+                                    Ambil Foto
+                                </button>
+
+                                <button type="button" id="retake"
+                                    class="hidden px-5 py-3 rounded-xl bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 transition">
+                                    Foto Ulang
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition">
+                            Check-in Sekarang
+                        </button>
+                    </form>
 
                 @elseif(!$absensiHariIni->jam_pulang)
 
@@ -154,6 +173,14 @@
                                 </p>
                             </div>
                         </div>
+
+                        @if($absensiHariIni->foto_masuk)
+                            <div class="mt-5 p-4 bg-white rounded-2xl border">
+                                <p class="font-semibold mb-2">Foto Masuk</p>
+                                <img src="{{ asset('storage/' . $absensiHariIni->foto_masuk) }}"
+                                    class="w-40 h-40 object-cover rounded-2xl border">
+                            </div>
+                        @endif
                     </div>
 
                 @endif
@@ -197,7 +224,7 @@
                     </div>
 
                     <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-700">
-                        Pastikan izin lokasi aktif sebelum melakukan absensi.
+                        Pastikan izin lokasi dan kamera aktif sebelum melakukan absensi.
                     </div>
                 </div>
             </div>
@@ -207,85 +234,14 @@
 </div>
 
 <script>
-
-    const formCheckin = document.getElementById('formCheckin');
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const capture = document.getElementById('capture');
-const previewFoto = document.getElementById('previewFoto');
-const previewImage = document.getElementById('previewImage');
-
-let fotoBlob = null;
-
-async function startCamera() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: "user" },
-            audio: false
-        });
-
-        video.srcObject = stream;
-    } catch (error) {
-        alert('Kamera gagal dibuka. Pastikan izin kamera aktif dan akses pakai HTTPS.');
-    }
-}
-
-capture.addEventListener('click', function () {
-    canvas.width = 320;
-    canvas.height = 240;
-
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    canvas.toBlob(function(blob) {
-        fotoBlob = blob;
-
-        previewImage.src = URL.createObjectURL(blob);
-        previewFoto.classList.remove('hidden');
-
-        alert('Foto berhasil diambil.');
-    }, 'image/jpeg', 0.4);
-});
-
-formCheckin.addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    if (!fotoBlob) {
-        alert('Ambil foto selfie dulu.');
-        return;
-    }
-
-    const formData = new FormData(formCheckin);
-    formData.append('foto_masuk', fotoBlob, 'foto_masuk.jpg');
-
-    fetch(formCheckin.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            location.reload();
-        } else {
-            alert('Check-in gagal.');
-        }
-    })
-    .catch(() => {
-        alert('Gagal mengirim absensi.');
-    });
-});
-
-startCamera();
-
-
     function updateClock() {
         const now = new Date();
+
         const clock = document.getElementById('clock');
 
         if (clock) {
             clock.innerText = now.toLocaleTimeString('id-ID', {
+                timeZone: 'Asia/Jakarta',
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit'
@@ -304,6 +260,7 @@ startCamera();
     const gpsText = document.getElementById('gpsText');
     const latText = document.getElementById('latText');
     const lngText = document.getElementById('lngText');
+    const lokasiStatus = document.getElementById('lokasiStatus');
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -320,9 +277,19 @@ startCamera();
                 if (gpsText) gpsText.innerText = 'Lokasi berhasil didapatkan';
                 if (latText) latText.innerText = lat;
                 if (lngText) lngText.innerText = lng;
+
+                if (lokasiStatus) {
+                    lokasiStatus.innerText = 'Lokasi aktif';
+                    lokasiStatus.className = 'text-xs px-3 py-1 rounded-full bg-green-100 text-green-700';
+                }
             },
             function () {
                 if (gpsText) gpsText.innerText = 'Gagal mengambil lokasi';
+
+                if (lokasiStatus) {
+                    lokasiStatus.innerText = 'Lokasi gagal';
+                    lokasiStatus.className = 'text-xs px-3 py-1 rounded-full bg-red-100 text-red-700';
+                }
             },
             {
                 enableHighAccuracy: true,
@@ -330,8 +297,108 @@ startCamera();
                 maximumAge: 0
             }
         );
-    } else {
-        if (gpsText) gpsText.innerText = 'Browser tidak mendukung GPS';
+    }
+
+    const formCheckin = document.getElementById('formCheckin');
+
+    if (formCheckin) {
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const capture = document.getElementById('capture');
+        const retake = document.getElementById('retake');
+        const previewFoto = document.getElementById('previewFoto');
+        const previewImage = document.getElementById('previewImage');
+
+        let fotoBlob = null;
+        let streamAktif = null;
+
+        async function startCamera() {
+            try {
+                streamAktif = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: "user"
+                    },
+                    audio: false
+                });
+
+                video.srcObject = streamAktif;
+            } catch (error) {
+                alert('Kamera gagal dibuka. Pastikan izin kamera aktif dan akses pakai HTTPS.');
+            }
+        }
+
+        function stopCamera() {
+            if (streamAktif) {
+                streamAktif.getTracks().forEach(track => track.stop());
+            }
+        }
+
+        capture.addEventListener('click', function () {
+            canvas.width = 320;
+            canvas.height = 240;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(function(blob) {
+                fotoBlob = blob;
+
+                previewImage.src = URL.createObjectURL(blob);
+                previewFoto.classList.remove('hidden');
+
+                video.classList.add('hidden');
+                capture.classList.add('hidden');
+                retake.classList.remove('hidden');
+
+                stopCamera();
+            }, 'image/jpeg', 0.4);
+        });
+
+        retake.addEventListener('click', function () {
+            fotoBlob = null;
+
+            previewImage.src = '';
+            previewFoto.classList.add('hidden');
+
+            video.classList.remove('hidden');
+            capture.classList.remove('hidden');
+            retake.classList.add('hidden');
+
+            startCamera();
+        });
+
+        formCheckin.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!fotoBlob) {
+                alert('Ambil foto selfie dulu.');
+                return;
+            }
+
+            const formData = new FormData(formCheckin);
+            formData.append('foto_masuk', fotoBlob, 'foto_masuk.jpg');
+
+            fetch(formCheckin.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    'Accept': 'text/html'
+                }
+            })
+            .then(response => {
+                if (response.ok || response.redirected) {
+                    window.location.href = "{{ route('pegawai.absensi.index') }}";
+                } else {
+                    alert('Check-in gagal.');
+                }
+            })
+            .catch(() => {
+                alert('Gagal mengirim absensi.');
+            });
+        });
+
+        startCamera();
     }
 </script>
 @endsection

@@ -95,8 +95,7 @@
                         </div>
                     </div>
 
-                    <button type="button"
-                        onclick="document.getElementById('formCheckin').submit();"
+                    <button type="submit"
                         class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold">
                         Check-in Sekarang
                     </button>

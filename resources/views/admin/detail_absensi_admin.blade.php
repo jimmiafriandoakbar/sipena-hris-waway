@@ -144,22 +144,24 @@
                             </td>
 
                             <td class="px-4 py-3 text-center">
-                                <div class="flex justify-center gap-2">
+                                <div class="flex justify-center gap-3">
+
                                     @if($item->foto_masuk)
-                                        <a href="{{ asset('storage/' . $item->foto_masuk) }}"
-                                           target="_blank"
-                                           class="px-3 py-1 rounded-lg bg-green-50 text-green-700 font-semibold">
-                                            Masuk
+                                        <a href="{{ asset('storage/' . $item->foto_masuk) }}" target="_blank">
+                                            <img src="{{ asset('storage/' . $item->foto_masuk) }}"
+                                                class="w-14 h-14 rounded-xl object-cover border border-green-300">
                                         </a>
+                                    @else
+                                        <span class="text-slate-400">-</span>
                                     @endif
 
                                     @if($item->foto_pulang)
-                                        <a href="{{ asset('storage/' . $item->foto_pulang) }}"
-                                           target="_blank"
-                                           class="px-3 py-1 rounded-lg bg-red-50 text-red-700 font-semibold">
-                                            Pulang
+                                        <a href="{{ asset('storage/' . $item->foto_pulang) }}" target="_blank">
+                                            <img src="{{ asset('storage/' . $item->foto_pulang) }}"
+                                                class="w-14 h-14 rounded-xl object-cover border border-red-300">
                                         </a>
                                     @endif
+
                                 </div>
                             </td>
                         </tr>

@@ -207,7 +207,7 @@
                             @if($absensiHariIni->foto_masuk)
                                 <div class="p-4 bg-white rounded-2xl border">
                                     <p class="font-semibold mb-2">Foto Masuk</p>
-                                    <img src="{{ asset('storage/' . $absensiHariIni->foto_masuk) }}"
+                                    <img src="{{ url('/storage/'.$absensiHariIni->foto_masuk) }}"
                                         class="w-40 h-40 object-cover rounded-2xl border">
                                 </div>
                             @endif
@@ -215,7 +215,7 @@
                             @if($absensiHariIni->foto_pulang)
                                 <div class="p-4 bg-white rounded-2xl border">
                                     <p class="font-semibold mb-2">Foto Pulang</p>
-                                    <img src="{{ asset('storage/' . $absensiHariIni->foto_pulang) }}"
+                                    <img src="{{ url('/storage/'.$absensiHariIni->foto_pulang) }}"
                                         class="w-40 h-40 object-cover rounded-2xl border">
                                 </div>
                             @endif

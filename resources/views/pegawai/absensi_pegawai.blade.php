@@ -1,19 +1,6 @@
 @extends('layouts.pegawai.app')
 
 @section('content')
-
-@if (session('success'))
-<script>
-    alert("{{ session('success') }}");
-</script>
-@endif
-
-@if (session('error'))
-<script>
-    alert("{{ session('error') }}");
-</script>
-@endif
-
 <div class="p-6 bg-slate-50 min-h-screen">
     <div class="max-w-5xl mx-auto">
 
@@ -352,15 +339,12 @@
                     el.innerText = 'Lokasi gagal';
                     el.className = 'text-xs px-3 py-1 rounded-full bg-red-100 text-red-700';
                 });
-            },
-            {
+            }, {
                 enableHighAccuracy: true,
                 timeout: 10000,
                 maximumAge: 0
             }
         );
-    } else {
-        if (gpsText) gpsText.innerText = 'Browser tidak mendukung GPS';
     }
 
     function setupCameraForm(config) {
@@ -397,9 +381,7 @@
 
         function stopCamera() {
             if (streamAktif) {
-                streamAktif.getTracks().forEach(function (track) {
-                    track.stop();
-                });
+                streamAktif.getTracks().forEach(track => track.stop());
             }
         }
 
@@ -445,26 +427,27 @@
                 return;
             }
 
-            const reader = new FileReader();
+            const formData = new FormData(form);
+            formData.append(config.fieldName, fotoBlob, config.fileName);
 
-            reader.onloadend = function () {
-                const oldInput = form.querySelector('input[name="' + config.fieldName + '"]');
-
-                if (oldInput) {
-                    oldInput.remove();
-                }
-
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = config.fieldName;
-                hiddenInput.value = reader.result;
-
-                form.appendChild(hiddenInput);
-
-                form.submit();
-            };
-
-            reader.readAsDataURL(fotoBlob);
+            fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                        'Accept': 'text/html'
+                    }
+                })
+                .then(response => {
+                    if (response.ok || response.redirected) {
+                        window.location.href = "{{ route('pegawai.absensi.index') }}";
+                    } else {
+                        alert('Absensi gagal dikirim.');
+                    }
+                })
+                .catch(() => {
+                    alert('Gagal mengirim absensi.');
+                });
         });
 
         startCamera();
@@ -478,7 +461,8 @@
         retakeId: 'retakeMasuk',
         previewBoxId: 'previewFotoMasuk',
         previewImageId: 'previewImageMasuk',
-        fieldName: 'foto_masuk'
+        fieldName: 'foto_masuk',
+        fileName: 'foto_masuk.jpg'
     });
 
     setupCameraForm({
@@ -489,7 +473,8 @@
         retakeId: 'retakePulang',
         previewBoxId: 'previewFotoPulang',
         previewImageId: 'previewImagePulang',
-        fieldName: 'foto_pulang'
+        fieldName: 'foto_pulang',
+        fileName: 'foto_pulang.jpg'
     });
 </script>
 @endsection

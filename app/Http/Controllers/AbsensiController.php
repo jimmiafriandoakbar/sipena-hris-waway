@@ -55,7 +55,7 @@ class AbsensiController extends Controller
         $request->validate([
             'latitude' => 'nullable',
             'longitude' => 'nullable',
-            'foto_masuk' => 'required|string',
+            'foto_masuk' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $now = Carbon::now('Asia/Jakarta');
@@ -75,14 +75,8 @@ class AbsensiController extends Controller
             return back()->with('error', 'Anda sudah melakukan check-in hari ini.');
         }
 
-        $fotoMasuk = $this->simpanFotoBase64(
-    $request->foto_masuk,
-    'absensi/foto_masuk'
-);
-
-if (!$fotoMasuk) {
-    return back()->with('error', 'Foto masuk tidak valid.');
-}
+        $fotoMasuk = $request->file('foto_masuk')
+            ->store('absensi/foto_masuk', 'public');
 
         $batasMasuk = Carbon::parse($setting->jam_masuk, 'Asia/Jakarta')
             ->addMinutes((int) $setting->toleransi_terlambat);
@@ -146,7 +140,7 @@ if (!$fotoMasuk) {
         $request->validate([
             'latitude' => 'nullable',
             'longitude' => 'nullable',
-            'foto_pulang' => 'required|string',
+            'foto_pulang' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $now = Carbon::now('Asia/Jakarta');
@@ -170,14 +164,8 @@ if (!$fotoMasuk) {
             return back()->with('error', 'Anda sudah melakukan check-out hari ini.');
         }
 
-        $fotoPulang = $this->simpanFotoBase64(
-                $request->foto_pulang,
-                'absensi/foto_pulang'
-            );
-
-            if (!$fotoPulang) {
-                return back()->with('error', 'Foto pulang tidak valid.');
-            }
+        $fotoPulang = $request->file('foto_pulang')
+            ->store('absensi/foto_pulang', 'public');
 
         $jamPulang = Carbon::parse($setting->jam_pulang, 'Asia/Jakarta');
         $jamMulaiLembur = Carbon::parse($setting->jam_mulai_lembur, 'Asia/Jakarta');
@@ -282,22 +270,6 @@ if (!$fotoMasuk) {
                 storage_path('app/public/' . $path)
             );
         }
-
-    private function simpanFotoBase64($base64, $folder)
-{
-    if (!$base64 || !str_contains($base64, 'base64,')) {
-        return null;
-    }
-
-    $image = explode('base64,', $base64)[1];
-    $image = str_replace(' ', '+', $image);
-
-    $namaFile = $folder . '/' . time() . '_' . uniqid() . '.jpg';
-
-    Storage::disk('public')->put($namaFile, base64_decode($image));
-
-    return $namaFile;
-}
 
 
 }

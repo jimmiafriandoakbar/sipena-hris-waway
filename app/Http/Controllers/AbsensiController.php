@@ -25,34 +25,44 @@ class AbsensiController extends Controller
     }
 
     private function simpanFotoBase64($base64, $folder)
-    {
-        if (!$base64) {
-            return null;
-        }
-
-        if (!preg_match('/^data:image\/(\w+);base64,/', $base64, $type)) {
-            return null;
-        }
-
-        $image = substr($base64, strpos($base64, ',') + 1);
-        $extension = strtolower($type[1]);
-
-        if (!in_array($extension, ['jpg', 'jpeg', 'png'])) {
-            return null;
-        }
-
-        $image = base64_decode($image);
-
-        if ($image === false) {
-            return null;
-        }
-
-        $fileName = $folder . '/' . date('Ymd_His') . '_' . Str::random(10) . '.' . $extension;
-
-        Storage::disk('public')->put($fileName, $image);
-
-        return $fileName;
+{
+    if (!$base64) {
+        return null;
     }
+
+    if (!preg_match('/^data:image\/(\w+);base64,/', $base64, $type)) {
+        return null;
+    }
+
+    $image = substr($base64, strpos($base64, ',') + 1);
+    $extension = strtolower($type[1]);
+
+    if ($extension === 'jpg') {
+        $extension = 'jpeg';
+    }
+
+    if (!in_array($extension, ['jpeg', 'png'])) {
+        return null;
+    }
+
+    $image = base64_decode($image);
+
+    if ($image === false) {
+        return null;
+    }
+
+    $fileName = $folder . '/' . date('Ymd_His') . '_' . Str::random(10) . '.' . $extension;
+
+    $path = storage_path('app/public/' . $fileName);
+
+    if (!file_exists(dirname($path))) {
+        mkdir(dirname($path), 0755, true);
+    }
+
+    file_put_contents($path, $image);
+
+    return $fileName;
+}
 
     private function hitungJarakMeter($lat1, $lon1, $lat2, $lon2)
     {

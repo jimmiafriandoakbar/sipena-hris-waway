@@ -96,9 +96,10 @@
                     </div>
 
                     <button type="submit"
-                        class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition">
-                        Check-in Sekarang
-                    </button>
+    onclick="this.closest('form').submit()"
+    class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold">
+    Check-in Sekarang
+</button>
                 </form>
 
                 @elseif(!$absensiHariIni->jam_pulang)

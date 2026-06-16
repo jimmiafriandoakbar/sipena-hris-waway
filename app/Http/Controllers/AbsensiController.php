@@ -8,6 +8,7 @@ use App\Models\Pegawai;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class AbsensiController extends Controller
 {
@@ -260,13 +261,15 @@ class AbsensiController extends Controller
     }
 
     public function lihatFoto($path)
-{
-    if (!Storage::disk('public')->exists($path)) {
-        abort(404);
-    }
+        {
+            if (!Storage::disk('public')->exists($path)) {
+                abort(404);
+            }
 
-    return response()->file(storage_path('app/public/' . $path));
-}
+            return response()->file(
+                storage_path('app/public/' . $path)
+            );
+        }
 
 
 }

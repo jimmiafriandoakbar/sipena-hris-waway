@@ -12,7 +12,6 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AbsensiSettingController;
-use Illuminate\Support\Facades\Storage;
 
 
 Route::get('/', function () {

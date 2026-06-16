@@ -52,7 +52,6 @@
 
                     <input type="hidden" name="latitude" id="latitude_masuk">
                     <input type="hidden" name="longitude" id="longitude_masuk">
-                    <input type="file" name="foto_masuk" id="foto_masuk_file" class="hidden" accept="image/*">
 
                     <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-5">
                         <div class="flex items-center justify-between mb-3">
@@ -118,7 +117,6 @@
 
                     <input type="hidden" name="latitude" id="latitude_pulang">
                     <input type="hidden" name="longitude" id="longitude_pulang">
-                    <input type="file" name="foto_pulang" id="foto_pulang_file" class="hidden" accept="image/*">
 
                     <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-5">
                         <div class="flex items-center justify-between mb-3">
@@ -429,18 +427,27 @@
                 return;
             }
 
-            const fileInput = document.getElementById(config.fileInputId);
+            const formData = new FormData(form);
+            formData.append(config.fieldName, fotoBlob, config.fileName);
 
-            const file = new File([fotoBlob], config.fileName, {
-                type: 'image/jpeg'
-            });
-
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-
-            fileInput.files = dataTransfer.files;
-
-            form.submit();
+            fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                        'Accept': 'text/html'
+                    }
+                })
+                .then(response => {
+                    if (response.ok || response.redirected) {
+                        window.location.href = "{{ route('pegawai.absensi.index') }}";
+                    } else {
+                        alert('Absensi gagal dikirim.');
+                    }
+                })
+                .catch(() => {
+                    alert('Gagal mengirim absensi.');
+                });
         });
 
         startCamera();
@@ -454,7 +461,7 @@
         retakeId: 'retakeMasuk',
         previewBoxId: 'previewFotoMasuk',
         previewImageId: 'previewImageMasuk',
-        fileInputId: 'foto_masuk_file',
+        fieldName: 'foto_masuk',
         fileName: 'foto_masuk.jpg'
     });
 
@@ -466,7 +473,7 @@
         retakeId: 'retakePulang',
         previewBoxId: 'previewFotoPulang',
         previewImageId: 'previewImagePulang',
-        fileInputId: 'foto_pulang_file',
+        fieldName: 'foto_pulang',
         fileName: 'foto_pulang.jpg'
     });
 </script>

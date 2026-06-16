@@ -52,14 +52,6 @@ class AbsensiController extends Controller
         $pegawai = Pegawai::where('user_id', Auth::id())->firstOrFail();
         $setting = AbsensiSetting::first();
 
-        dd([
-            'jam_masuk' => $setting->jam_masuk,
-            'jam_pulang' => $setting->jam_pulang,
-            'jam_mulai_lembur' => $setting->jam_mulai_lembur,
-            'toleransi' => $setting->toleransi_terlambat,
-            'type_toleransi' => gettype($setting->toleransi_terlambat),
-        ]);
-
         if (!$setting) {
             return back()->with('error', 'Parameter absensi belum diatur admin.');
         }
@@ -75,7 +67,9 @@ class AbsensiController extends Controller
         $now = Carbon::now();
 
         $batasMasuk = Carbon::parse($setting->jam_masuk)
-            ->addMinutes($setting->toleransi_terlambat);
+            ->addMinutes((int) $setting->toleransi_terlambat);
+
+        $radiusAbsensi = (float) $setting->radius_absensi;
 
         $statusMasuk = $now->format('H:i:s') <= $batasMasuk->format('H:i:s')
             ? 'hadir'
@@ -100,7 +94,7 @@ class AbsensiController extends Controller
                 return back()->with('error', 'Lokasi GPS tidak terdeteksi.');
             }
 
-            if ($jarakMasuk > $setting->radius_absensi) {
+            if ($jarakMasuk > $radiusAbsensi) {
                 return back()->with('error', 'Anda berada di luar radius absensi. Jarak: ' . $jarakMasuk . ' meter.');
             }
         }

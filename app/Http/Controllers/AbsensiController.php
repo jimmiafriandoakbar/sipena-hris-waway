@@ -52,6 +52,14 @@ class AbsensiController extends Controller
         $pegawai = Pegawai::where('user_id', Auth::id())->firstOrFail();
         $setting = AbsensiSetting::first();
 
+        dd([
+            'jam_masuk' => $setting->jam_masuk,
+            'jam_pulang' => $setting->jam_pulang,
+            'jam_mulai_lembur' => $setting->jam_mulai_lembur,
+            'toleransi' => $setting->toleransi_terlambat,
+            'type_toleransi' => gettype($setting->toleransi_terlambat),
+        ]);
+
         if (!$setting) {
             return back()->with('error', 'Parameter absensi belum diatur admin.');
         }

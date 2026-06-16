@@ -14,15 +14,15 @@
         </div>
 
         @if(session('success'))
-            <div class="mb-4 p-4 rounded-2xl bg-green-50 border border-green-200 text-green-700 font-semibold">
-                {{ session('success') }}
-            </div>
+        <div class="mb-4 p-4 rounded-2xl bg-green-50 border border-green-200 text-green-700 font-semibold">
+            {{ session('success') }}
+        </div>
         @endif
 
         @if(session('error'))
-            <div class="mb-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 font-semibold">
-                {{ session('error') }}
-            </div>
+        <div class="mb-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 font-semibold">
+            {{ session('error') }}
+        </div>
         @endif
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -47,180 +47,190 @@
 
                 @if(!$absensiHariIni)
 
-                    <form id="formCheckin" method="POST" action="{{ route('pegawai.absensi.checkin') }}">
-                        @csrf
+                <form id="formCheckin" method="POST" action="{{ route('pegawai.absensi.checkin') }}">
+                    @csrf
 
-                        <input type="hidden" name="latitude" id="latitude_masuk">
-                        <input type="hidden" name="longitude" id="longitude_masuk">
+                    <input type="hidden" name="latitude" id="latitude_masuk">
+                    <input type="hidden" name="longitude" id="longitude_masuk">
 
-                        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-5">
-                            <div class="flex items-center justify-between mb-3">
-                                <h3 class="font-bold text-slate-700">
-                                    Kamera Selfie Masuk
-                                </h3>
+                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-slate-700">
+                                Kamera Selfie Masuk
+                            </h3>
 
-                                <span id="lokasiStatus"
-                                    class="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">
-                                    Mengambil lokasi...
-                                </span>
-                            </div>
-
-                            <div class="relative overflow-hidden rounded-2xl bg-black">
-                                <video id="video_masuk" autoplay playsinline muted class="w-full h-[320px] object-cover"></video>
-                            </div>
-
-                            <canvas id="canvas_masuk" class="hidden"></canvas>
-
-                            <div id="previewFotoMasuk" class="hidden mt-4">
-                                <p class="font-semibold text-slate-700 mb-2">
-                                    Preview Foto
-                                </p>
-                                <img id="previewImageMasuk"
-                                    class="w-40 h-40 object-cover rounded-2xl border border-slate-200 shadow-sm">
-                            </div>
-
-                            <div class="flex flex-wrap gap-3 mt-4">
-                                <button type="button" id="captureMasuk"
-                                    class="px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
-                                    Ambil Foto
-                                </button>
-
-                                <button type="button" id="retakeMasuk"
-                                    class="hidden px-5 py-3 rounded-xl bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 transition">
-                                    Foto Ulang
-                                </button>
-                            </div>
+                            <span id="lokasiStatus"
+                                class="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">
+                                Mengambil lokasi...
+                            </span>
                         </div>
 
-                        <button type="submit"
-                            class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition">
-                            Check-in Sekarang
-                        </button>
-                    </form>
+                        <div class="relative overflow-hidden rounded-2xl bg-black">
+                            <video id="video_masuk" autoplay playsinline muted
+                                class="w-full h-[320px] object-cover"></video>
+                        </div>
+
+                        <canvas id="canvas_masuk" class="hidden"></canvas>
+
+                        <div id="previewFotoMasuk" class="hidden mt-4">
+                            <p class="font-semibold text-slate-700 mb-2">
+                                Preview Foto
+                            </p>
+                            <img id="previewImageMasuk"
+                                class="w-40 h-40 object-cover rounded-2xl border border-slate-200 shadow-sm">
+                        </div>
+
+                        <div class="flex flex-wrap gap-3 mt-4">
+                            <button type="button" id="captureMasuk"
+                                class="px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
+                                Ambil Foto
+                            </button>
+
+                            <button type="button" id="retakeMasuk"
+                                class="hidden px-5 py-3 rounded-xl bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 transition">
+                                Foto Ulang
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition">
+                        Check-in Sekarang
+                    </button>
+                </form>
 
                 @elseif(!$absensiHariIni->jam_pulang)
 
-                    <div class="mb-5 rounded-2xl bg-blue-50 border border-blue-200 p-4">
-                        <p class="text-slate-600">Jam Masuk</p>
-                        <p class="text-2xl font-bold text-blue-700">
-                            {{ $absensiHariIni->jam_masuk }}
-                        </p>
-                        <p class="mt-2">
-                            Status:
-                            <strong>{{ ucfirst($absensiHariIni->status_masuk) }}</strong>
-                        </p>
-                    </div>
+                <div class="mb-5 rounded-2xl bg-blue-50 border border-blue-200 p-4">
+                    <p class="text-slate-600">Jam Masuk</p>
+                    <p class="text-2xl font-bold text-blue-700">
+                        {{ $absensiHariIni->jam_masuk }}
+                    </p>
+                    <p class="mt-2">
+                        Status:
+                        <strong>{{ ucfirst($absensiHariIni->status_masuk) }}</strong>
+                    </p>
+                </div>
 
-                    <form id="formCheckout" method="POST" action="{{ route('pegawai.absensi.checkout') }}">
-                        @csrf
+                <form id="formCheckout" method="POST" action="{{ route('pegawai.absensi.checkout') }}">
+                    @csrf
 
-                        <input type="hidden" name="latitude" id="latitude_pulang">
-                        <input type="hidden" name="longitude" id="longitude_pulang">
+                    <input type="hidden" name="latitude" id="latitude_pulang">
+                    <input type="hidden" name="longitude" id="longitude_pulang">
 
-                        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-5">
-                            <div class="flex items-center justify-between mb-3">
-                                <h3 class="font-bold text-slate-700">
-                                    Kamera Selfie Pulang
-                                </h3>
+                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-slate-700">
+                                Kamera Selfie Pulang
+                            </h3>
 
-                                <span id="lokasiStatus"
-                                    class="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">
-                                    Mengambil lokasi...
-                                </span>
-                            </div>
-
-                            <div class="relative overflow-hidden rounded-2xl bg-black">
-                                <video id="video_pulang" autoplay playsinline muted class="w-full h-[320px] object-cover"></video>
-                            </div>
-
-                            <canvas id="canvas_pulang" class="hidden"></canvas>
-
-                            <div id="previewFotoPulang" class="hidden mt-4">
-                                <p class="font-semibold text-slate-700 mb-2">
-                                    Preview Foto
-                                </p>
-                                <img id="previewImagePulang"
-                                    class="w-40 h-40 object-cover rounded-2xl border border-slate-200 shadow-sm">
-                            </div>
-
-                            <div class="flex flex-wrap gap-3 mt-4">
-                                <button type="button" id="capturePulang"
-                                    class="px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
-                                    Ambil Foto
-                                </button>
-
-                                <button type="button" id="retakePulang"
-                                    class="hidden px-5 py-3 rounded-xl bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 transition">
-                                    Foto Ulang
-                                </button>
-                            </div>
+                            <span id="lokasiStatus"
+                                class="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">
+                                Mengambil lokasi...
+                            </span>
                         </div>
 
-                        <button type="submit"
-                            class="w-full px-5 py-4 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-700 transition">
-                            Check-out Sekarang
-                        </button>
-                    </form>
+                        <div class="relative overflow-hidden rounded-2xl bg-black">
+                            <video id="video_pulang" autoplay playsinline muted
+                                class="w-full h-[320px] object-cover"></video>
+                        </div>
+
+                        <canvas id="canvas_pulang" class="hidden"></canvas>
+
+                        <div id="previewFotoPulang" class="hidden mt-4">
+                            <p class="font-semibold text-slate-700 mb-2">
+                                Preview Foto
+                            </p>
+                            <img id="previewImagePulang"
+                                class="w-40 h-40 object-cover rounded-2xl border border-slate-200 shadow-sm">
+                        </div>
+
+                        <div class="flex flex-wrap gap-3 mt-4">
+                            <button type="button" id="capturePulang"
+                                class="px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
+                                Ambil Foto
+                            </button>
+
+                            <button type="button" id="retakePulang"
+                                class="hidden px-5 py-3 rounded-xl bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 transition">
+                                Foto Ulang
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full px-5 py-4 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-700 transition">
+                        Check-out Sekarang
+                    </button>
+                </form>
 
                 @else
 
-                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                        <h3 class="text-lg font-bold text-slate-800 mb-4">
-                            Absensi Hari Ini Selesai
-                        </h3>
+                <div class="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">
+                        Absensi Hari Ini Selesai
+                    </h3>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="p-4 bg-white rounded-2xl border">
-                                <p class="text-slate-500">Jam Masuk</p>
-                                <p class="text-xl font-bold">{{ $absensiHariIni->jam_masuk }}</p>
-                            </div>
-
-                            <div class="p-4 bg-white rounded-2xl border">
-                                <p class="text-slate-500">Jam Pulang</p>
-                                <p class="text-xl font-bold">{{ $absensiHariIni->jam_pulang }}</p>
-                            </div>
-
-                            <div class="p-4 bg-white rounded-2xl border">
-                                <p class="text-slate-500">Status Masuk</p>
-                                <p class="text-xl font-bold">{{ ucfirst($absensiHariIni->status_masuk) }}</p>
-                            </div>
-
-                            <div class="p-4 bg-white rounded-2xl border">
-                                <p class="text-slate-500">Status Pulang</p>
-                                <p class="text-xl font-bold">
-                                    {{ ucfirst(str_replace('_', ' ', $absensiHariIni->status_pulang)) }}
-                                </p>
-                            </div>
-
-                            <div class="p-4 bg-white rounded-2xl border md:col-span-2">
-                                <p class="text-slate-500">Total Lembur</p>
-                                <p class="text-xl font-bold">
-                                    {{ floor(($absensiHariIni->total_menit_lembur ?? 0) / 60) }}
-                                    Jam
-                                    {{ ($absensiHariIni->total_menit_lembur ?? 0) % 60 }}
-                                    Menit
-                                </p>
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-white rounded-2xl border">
+                            <p class="text-slate-500">Jam Masuk</p>
+                            <p class="text-xl font-bold">{{ $absensiHariIni->jam_masuk }}</p>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
-                            @if($absensiHariIni->foto_masuk)
-                                <div class="p-4 bg-white rounded-2xl border">
-                                    <p class="font-semibold mb-2">Foto Masuk</p>
-                                    <img src="{{ url('/storage/'.$absensiHariIni->foto_masuk) }}"
-                                        class="w-40 h-40 object-cover rounded-2xl border">
-                                </div>
-                            @endif
+                        <div class="p-4 bg-white rounded-2xl border">
+                            <p class="text-slate-500">Jam Pulang</p>
+                            <p class="text-xl font-bold">{{ $absensiHariIni->jam_pulang }}</p>
+                        </div>
 
-                            @if($absensiHariIni->foto_pulang)
-                                <div class="p-4 bg-white rounded-2xl border">
-                                    <p class="font-semibold mb-2">Foto Pulang</p>
-                                    <img src="{{ url('/storage/'.$absensiHariIni->foto_pulang) }}"
-                                        class="w-40 h-40 object-cover rounded-2xl border">
-                                </div>
-                            @endif
+                        <div class="p-4 bg-white rounded-2xl border">
+                            <p class="text-slate-500">Status Masuk</p>
+                            <p class="text-xl font-bold">{{ ucfirst($absensiHariIni->status_masuk) }}</p>
+                        </div>
+
+                        <div class="p-4 bg-white rounded-2xl border">
+                            <p class="text-slate-500">Status Pulang</p>
+                            <p class="text-xl font-bold">
+                                {{ ucfirst(str_replace('_', ' ', $absensiHariIni->status_pulang)) }}
+                            </p>
+                        </div>
+
+                        <div class="p-4 bg-white rounded-2xl border md:col-span-2">
+                            <p class="text-slate-500">Total Lembur</p>
+                            <p class="text-xl font-bold">
+                                {{ floor(($absensiHariIni->total_menit_lembur ?? 0) / 60) }}
+                                Jam
+                                {{ ($absensiHariIni->total_menit_lembur ?? 0) % 60 }}
+                                Menit
+                            </p>
                         </div>
                     </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+                        @if($absensiHariIni->foto_masuk)
+                        <div class="p-4 bg-white rounded-2xl border">
+                            <p class="font-semibold mb-2">Foto Masuk</p>
+
+                            <a href="{{ route('pegawai.absensi.foto', ['path' => $absensiHariIni->foto_masuk]) }}"
+                                target="_blank">
+                                <img src="{{ route('pegawai.absensi.foto', ['path' => $absensiHariIni->foto_masuk]) }}"
+                                    class="w-40 h-40 object-cover rounded-2xl border">
+                            </a>
+                        </div>
+                        @endif
+
+                        @if($absensiHariIni->foto_pulang)
+                        <div class="p-4 bg-white rounded-2xl border">
+                            <p class="font-semibold mb-2">Foto Pulang</p>
+
+                            <a href="{{ route('pegawai.absensi.foto', ['path' => $absensiHariIni->foto_pulang]) }}"
+                                target="_blank">
+                                <img src="{{ route('pegawai.absensi.foto', ['path' => $absensiHariIni->foto_pulang]) }}"
+                                    class="w-40 h-40 object-cover rounded-2xl border">
+                            </a>
+                        </div>
+                        @endif
+                    </div>
+                </div>
 
                 @endif
             </div>
@@ -317,7 +327,7 @@
                 if (latText) latText.innerText = lat;
                 if (lngText) lngText.innerText = lng;
 
-                lokasiStatusList.forEach(function(el) {
+                lokasiStatusList.forEach(function (el) {
                     el.innerText = 'Lokasi aktif';
                     el.className = 'text-xs px-3 py-1 rounded-full bg-green-100 text-green-700';
                 });
@@ -325,12 +335,11 @@
             function () {
                 if (gpsText) gpsText.innerText = 'Gagal mengambil lokasi';
 
-                lokasiStatusList.forEach(function(el) {
+                lokasiStatusList.forEach(function (el) {
                     el.innerText = 'Lokasi gagal';
                     el.className = 'text-xs px-3 py-1 rounded-full bg-red-100 text-red-700';
                 });
-            },
-            {
+            }, {
                 enableHighAccuracy: true,
                 timeout: 10000,
                 maximumAge: 0
@@ -383,7 +392,7 @@
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            canvas.toBlob(function(blob) {
+            canvas.toBlob(function (blob) {
                 fotoBlob = blob;
 
                 previewImage.src = URL.createObjectURL(blob);
@@ -410,7 +419,7 @@
             startCamera();
         });
 
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function (e) {
             e.preventDefault();
 
             if (!fotoBlob) {
@@ -422,23 +431,23 @@
             formData.append(config.fieldName, fotoBlob, config.fileName);
 
             fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
-                    'Accept': 'text/html'
-                }
-            })
-            .then(response => {
-                if (response.ok || response.redirected) {
-                    window.location.href = "{{ route('pegawai.absensi.index') }}";
-                } else {
-                    alert('Absensi gagal dikirim.');
-                }
-            })
-            .catch(() => {
-                alert('Gagal mengirim absensi.');
-            });
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                        'Accept': 'text/html'
+                    }
+                })
+                .then(response => {
+                    if (response.ok || response.redirected) {
+                        window.location.href = "{{ route('pegawai.absensi.index') }}";
+                    } else {
+                        alert('Absensi gagal dikirim.');
+                    }
+                })
+                .catch(() => {
+                    alert('Gagal mengirim absensi.');
+                });
         });
 
         startCamera();

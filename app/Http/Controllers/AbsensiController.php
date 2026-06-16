@@ -258,4 +258,15 @@ class AbsensiController extends Controller
             'tahun'
         ));
     }
+
+    public function lihatFoto($path)
+{
+    if (!Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+
+    return response()->file(storage_path('app/public/' . $path));
+}
+
+
 }

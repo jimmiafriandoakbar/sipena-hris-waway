@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AbsensiSettingController;
+use Illuminate\Support\Facades\Storage;
 
 
 Route::get('/', function () {
@@ -106,6 +107,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','role:admin'])->group
     
     Route::get('/absensi/detail/{pegawai}', [AbsensiController::class, 'detailAdmin'])
         ->name('absensi.detail');
+
+    Route::get('/absensi/foto/{path}', [AbsensiController::class, 'lihatFoto'])
+    ->where('path', '.*')
+    ->name('absensi.foto');
 
 });
 
@@ -230,6 +235,10 @@ Route::prefix('pegawai')->name('pegawai.')->middleware(['auth','role:pegawai'])-
     Route::get('/absensi/check-out', function () {
         return redirect()->route('pegawai.absensi.index');
     });
+
+    Route::get('/absensi/foto/{path}', [AbsensiController::class, 'lihatFoto'])
+        ->where('path', '.*')
+        ->name('absensi.foto');
 
     Route::get('/detail-gaji', function () {
     return view('pegawai.detail_gaji');

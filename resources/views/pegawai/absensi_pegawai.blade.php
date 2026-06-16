@@ -48,7 +48,7 @@
 
                 @if(!$absensiHariIni)
 
-                <form method="POST" action="{{ route('pegawai.absensi.checkin.test') }}">
+                <form id="formCheckin" method="POST" action="/pegawai/absensi/check-in-test">
                     @csrf
 
                     <input type="hidden" name="latitude" id="latitude_masuk">
@@ -95,9 +95,11 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold">
-    Check-in Sekarang
-</button>
+                    <button type="button"
+                        onclick="document.getElementById('formCheckin').submit();"
+                        class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold">
+                        Check-in Sekarang
+                    </button>
                 </form>
 
                 @elseif(!$absensiHariIni->jam_pulang)

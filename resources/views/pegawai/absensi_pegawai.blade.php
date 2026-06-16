@@ -9,7 +9,7 @@
                 Absensi Pegawai
             </h1>
             <p class="text-slate-500 mt-1">
-                Check-in menggunakan kamera selfie dan lokasi GPS.
+                Check-in dan check-out menggunakan kamera selfie serta lokasi GPS.
             </p>
         </div>
 
@@ -66,26 +66,26 @@
                             </div>
 
                             <div class="relative overflow-hidden rounded-2xl bg-black">
-                                <video id="video" autoplay playsinline muted class="w-full h-[320px] object-cover"></video>
+                                <video id="video_masuk" autoplay playsinline muted class="w-full h-[320px] object-cover"></video>
                             </div>
 
-                            <canvas id="canvas" class="hidden"></canvas>
+                            <canvas id="canvas_masuk" class="hidden"></canvas>
 
-                            <div id="previewFoto" class="hidden mt-4">
+                            <div id="previewFotoMasuk" class="hidden mt-4">
                                 <p class="font-semibold text-slate-700 mb-2">
                                     Preview Foto
                                 </p>
-                                <img id="previewImage"
+                                <img id="previewImageMasuk"
                                     class="w-40 h-40 object-cover rounded-2xl border border-slate-200 shadow-sm">
                             </div>
 
                             <div class="flex flex-wrap gap-3 mt-4">
-                                <button type="button" id="capture"
+                                <button type="button" id="captureMasuk"
                                     class="px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
                                     Ambil Foto
                                 </button>
 
-                                <button type="button" id="retake"
+                                <button type="button" id="retakeMasuk"
                                     class="hidden px-5 py-3 rounded-xl bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 transition">
                                     Foto Ulang
                                 </button>
@@ -111,20 +111,49 @@
                         </p>
                     </div>
 
-                    <form method="POST" action="{{ route('pegawai.absensi.checkout') }}">
+                    <form id="formCheckout" method="POST" action="{{ route('pegawai.absensi.checkout') }}">
                         @csrf
 
                         <input type="hidden" name="latitude" id="latitude_pulang">
                         <input type="hidden" name="longitude" id="longitude_pulang">
 
-                        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-5 mb-5">
-                            <h3 class="font-bold text-slate-700 mb-3">
-                                Check-out Hari Ini
-                            </h3>
+                        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-5">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-bold text-slate-700">
+                                    Kamera Selfie Pulang
+                                </h3>
 
-                            <p class="text-slate-500 text-sm">
-                                Pastikan GPS aktif sebelum melakukan check-out.
-                            </p>
+                                <span id="lokasiStatus"
+                                    class="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-700">
+                                    Mengambil lokasi...
+                                </span>
+                            </div>
+
+                            <div class="relative overflow-hidden rounded-2xl bg-black">
+                                <video id="video_pulang" autoplay playsinline muted class="w-full h-[320px] object-cover"></video>
+                            </div>
+
+                            <canvas id="canvas_pulang" class="hidden"></canvas>
+
+                            <div id="previewFotoPulang" class="hidden mt-4">
+                                <p class="font-semibold text-slate-700 mb-2">
+                                    Preview Foto
+                                </p>
+                                <img id="previewImagePulang"
+                                    class="w-40 h-40 object-cover rounded-2xl border border-slate-200 shadow-sm">
+                            </div>
+
+                            <div class="flex flex-wrap gap-3 mt-4">
+                                <button type="button" id="capturePulang"
+                                    class="px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
+                                    Ambil Foto
+                                </button>
+
+                                <button type="button" id="retakePulang"
+                                    class="hidden px-5 py-3 rounded-xl bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 transition">
+                                    Foto Ulang
+                                </button>
+                            </div>
                         </div>
 
                         <button type="submit"
@@ -174,13 +203,23 @@
                             </div>
                         </div>
 
-                        @if($absensiHariIni->foto_masuk)
-                            <div class="mt-5 p-4 bg-white rounded-2xl border">
-                                <p class="font-semibold mb-2">Foto Masuk</p>
-                                <img src="{{ asset('storage/' . $absensiHariIni->foto_masuk) }}"
-                                    class="w-40 h-40 object-cover rounded-2xl border">
-                            </div>
-                        @endif
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+                            @if($absensiHariIni->foto_masuk)
+                                <div class="p-4 bg-white rounded-2xl border">
+                                    <p class="font-semibold mb-2">Foto Masuk</p>
+                                    <img src="{{ asset('storage/' . $absensiHariIni->foto_masuk) }}"
+                                        class="w-40 h-40 object-cover rounded-2xl border">
+                                </div>
+                            @endif
+
+                            @if($absensiHariIni->foto_pulang)
+                                <div class="p-4 bg-white rounded-2xl border">
+                                    <p class="font-semibold mb-2">Foto Pulang</p>
+                                    <img src="{{ asset('storage/' . $absensiHariIni->foto_pulang) }}"
+                                        class="w-40 h-40 object-cover rounded-2xl border">
+                                </div>
+                            @endif
+                        </div>
                     </div>
 
                 @endif
@@ -236,7 +275,6 @@
 <script>
     function updateClock() {
         const now = new Date();
-
         const clock = document.getElementById('clock');
 
         if (clock) {
@@ -260,7 +298,8 @@
     const gpsText = document.getElementById('gpsText');
     const latText = document.getElementById('latText');
     const lngText = document.getElementById('lngText');
-    const lokasiStatus = document.getElementById('lokasiStatus');
+
+    const lokasiStatusList = document.querySelectorAll('#lokasiStatus');
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -278,18 +317,18 @@
                 if (latText) latText.innerText = lat;
                 if (lngText) lngText.innerText = lng;
 
-                if (lokasiStatus) {
-                    lokasiStatus.innerText = 'Lokasi aktif';
-                    lokasiStatus.className = 'text-xs px-3 py-1 rounded-full bg-green-100 text-green-700';
-                }
+                lokasiStatusList.forEach(function(el) {
+                    el.innerText = 'Lokasi aktif';
+                    el.className = 'text-xs px-3 py-1 rounded-full bg-green-100 text-green-700';
+                });
             },
             function () {
                 if (gpsText) gpsText.innerText = 'Gagal mengambil lokasi';
 
-                if (lokasiStatus) {
-                    lokasiStatus.innerText = 'Lokasi gagal';
-                    lokasiStatus.className = 'text-xs px-3 py-1 rounded-full bg-red-100 text-red-700';
-                }
+                lokasiStatusList.forEach(function(el) {
+                    el.innerText = 'Lokasi gagal';
+                    el.className = 'text-xs px-3 py-1 rounded-full bg-red-100 text-red-700';
+                });
             },
             {
                 enableHighAccuracy: true,
@@ -299,15 +338,19 @@
         );
     }
 
-    const formCheckin = document.getElementById('formCheckin');
+    function setupCameraForm(config) {
+        const form = document.getElementById(config.formId);
 
-    if (formCheckin) {
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const capture = document.getElementById('capture');
-        const retake = document.getElementById('retake');
-        const previewFoto = document.getElementById('previewFoto');
-        const previewImage = document.getElementById('previewImage');
+        if (!form) {
+            return;
+        }
+
+        const video = document.getElementById(config.videoId);
+        const canvas = document.getElementById(config.canvasId);
+        const capture = document.getElementById(config.captureId);
+        const retake = document.getElementById(config.retakeId);
+        const previewFoto = document.getElementById(config.previewBoxId);
+        const previewImage = document.getElementById(config.previewImageId);
 
         let fotoBlob = null;
         let streamAktif = null;
@@ -367,7 +410,7 @@
             startCamera();
         });
 
-        formCheckin.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function(e) {
             e.preventDefault();
 
             if (!fotoBlob) {
@@ -375,14 +418,14 @@
                 return;
             }
 
-            const formData = new FormData(formCheckin);
-            formData.append('foto_masuk', fotoBlob, 'foto_masuk.jpg');
+            const formData = new FormData(form);
+            formData.append(config.fieldName, fotoBlob, config.fileName);
 
-            fetch(formCheckin.action, {
+            fetch(form.action, {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
                     'Accept': 'text/html'
                 }
             })
@@ -390,7 +433,7 @@
                 if (response.ok || response.redirected) {
                     window.location.href = "{{ route('pegawai.absensi.index') }}";
                 } else {
-                    alert('Check-in gagal.');
+                    alert('Absensi gagal dikirim.');
                 }
             })
             .catch(() => {
@@ -400,5 +443,29 @@
 
         startCamera();
     }
+
+    setupCameraForm({
+        formId: 'formCheckin',
+        videoId: 'video_masuk',
+        canvasId: 'canvas_masuk',
+        captureId: 'captureMasuk',
+        retakeId: 'retakeMasuk',
+        previewBoxId: 'previewFotoMasuk',
+        previewImageId: 'previewImageMasuk',
+        fieldName: 'foto_masuk',
+        fileName: 'foto_masuk.jpg'
+    });
+
+    setupCameraForm({
+        formId: 'formCheckout',
+        videoId: 'video_pulang',
+        canvasId: 'canvas_pulang',
+        captureId: 'capturePulang',
+        retakeId: 'retakePulang',
+        previewBoxId: 'previewFotoPulang',
+        previewImageId: 'previewImagePulang',
+        fieldName: 'foto_pulang',
+        fileName: 'foto_pulang.jpg'
+    });
 </script>
 @endsection

@@ -231,6 +231,10 @@ Route::prefix('pegawai')->name('pegawai.')->middleware(['auth','role:pegawai'])-
         return redirect()->route('pegawai.absensi.index');
     });
 
+    Route::post('/absensi/check-in-test', function () {
+    dd('POST TEST MASUK');
+})->name('absensi.checkin.test');
+
     Route::get('/detail-gaji', function () {
     return view('pegawai.detail_gaji');
 })->name('detail.gaji');

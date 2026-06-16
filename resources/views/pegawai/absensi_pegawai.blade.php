@@ -14,15 +14,15 @@
         </div>
 
         @if(session('success'))
-        <div class="mb-4 p-4 rounded-2xl bg-green-50 border border-green-200 text-green-700 font-semibold">
-            {{ session('success') }}
-        </div>
+            <div class="mb-4 p-4 rounded-2xl bg-green-50 border border-green-200 text-green-700 font-semibold">
+                {{ session('success') }}
+            </div>
         @endif
 
         @if(session('error'))
-        <div class="mb-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 font-semibold">
-            {{ session('error') }}
-        </div>
+            <div class="mb-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 font-semibold">
+                {{ session('error') }}
+            </div>
         @endif
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -47,113 +47,114 @@
 
                 @if(!$absensiHariIni)
 
-                <form method="POST" action="{{ route('pegawai.absensi.checkin') }}">
-                    @csrf
+                    <form id="formCheckin" method="POST" action="{{ route('pegawai.absensi.checkin') }}">
+    @csrf
 
-                    <input type="hidden" name="latitude" id="latitude_masuk">
-                    <input type="hidden" name="longitude" id="longitude_masuk">
+    <input type="hidden" name="latitude" id="latitude_masuk">
+    <input type="hidden" name="longitude" id="longitude_masuk">
 
-                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-5 mb-5">
-                        <h3 class="font-bold text-slate-700 mb-3">
-                            Check-in Hari Ini
-                        </h3>
+    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-5">
+        <h3 class="font-bold text-slate-700 mb-3">Kamera Selfie Masuk</h3>
 
-                        <p class="text-slate-500 text-sm">
-                            Pastikan GPS aktif sebelum melakukan check-in.
-                        </p>
-                    </div>
+        <div class="relative overflow-hidden rounded-2xl bg-black">
+            <video id="video" autoplay playsinline muted class="w-full h-[320px] object-cover"></video>
+        </div>
 
-                    <button type="submit"
-                        class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition">
-                        Check-in Sekarang
-                    </button>
-                </form>
+        <canvas id="canvas" class="hidden"></canvas>
+
+        <div id="previewFoto" class="hidden mt-4">
+            <p class="font-semibold text-slate-700 mb-2">Preview Foto</p>
+            <img id="previewImage" class="w-40 h-40 object-cover rounded-2xl border">
+        </div>
+
+        <button type="button" id="capture"
+            class="mt-4 px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold">
+            Ambil Foto
+        </button>
+    </div>
+
+    <button type="submit"
+        class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold">
+        Check-in Sekarang
+    </button>
+</form>
 
                 @elseif(!$absensiHariIni->jam_pulang)
 
-                <div class="mb-5 rounded-2xl bg-blue-50 border border-blue-200 p-4">
-                    <p class="text-slate-600">Jam Masuk</p>
-                    <p class="text-2xl font-bold text-blue-700">
-                        {{ $absensiHariIni->jam_masuk }}
-                    </p>
-                    <p class="mt-2">
-                        Status:
-                        <strong>{{ ucfirst($absensiHariIni->status_masuk) }}</strong>
-                    </p>
-                </div>
-
-                <form id="formCheckin" method="POST" action="{{ route('pegawai.absensi.checkin') }}">
-                    @csrf
-
-                    <input type="hidden" name="latitude" id="latitude_masuk">
-                    <input type="hidden" name="longitude" id="longitude_masuk">
-
-                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-5">
-                        <h3 class="font-bold text-slate-700 mb-3">Kamera Selfie Masuk</h3>
-
-                        <div class="relative overflow-hidden rounded-2xl bg-black">
-                            <video id="video" autoplay playsinline muted class="w-full h-[320px] object-cover"></video>
-                        </div>
-
-                        <canvas id="canvas" class="hidden"></canvas>
-
-                        <div id="previewFoto" class="hidden mt-4">
-                            <p class="font-semibold text-slate-700 mb-2">Preview Foto</p>
-                            <img id="previewImage" class="w-40 h-40 object-cover rounded-2xl border">
-                        </div>
-
-                        <button type="button" id="capture"
-                            class="mt-4 px-5 py-3 rounded-xl bg-emerald-600 text-white font-semibold">
-                            Ambil Foto
-                        </button>
+                    <div class="mb-5 rounded-2xl bg-blue-50 border border-blue-200 p-4">
+                        <p class="text-slate-600">Jam Masuk</p>
+                        <p class="text-2xl font-bold text-blue-700">
+                            {{ $absensiHariIni->jam_masuk }}
+                        </p>
+                        <p class="mt-2">
+                            Status:
+                            <strong>{{ ucfirst($absensiHariIni->status_masuk) }}</strong>
+                        </p>
                     </div>
 
-                    <button type="submit" class="w-full px-5 py-4 rounded-2xl bg-blue-600 text-white font-bold">
-                        Check-in Sekarang
-                    </button>
-                </form>
+                    <form method="POST" action="{{ route('pegawai.absensi.checkout') }}">
+                        @csrf
+
+                        <input type="hidden" name="latitude" id="latitude_pulang">
+                        <input type="hidden" name="longitude" id="longitude_pulang">
+
+                        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-5 mb-5">
+                            <h3 class="font-bold text-slate-700 mb-3">
+                                Check-out Hari Ini
+                            </h3>
+
+                            <p class="text-slate-500 text-sm">
+                                Pastikan GPS aktif sebelum melakukan check-out.
+                            </p>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full px-5 py-4 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-700 transition">
+                            Check-out Sekarang
+                        </button>
+                    </form>
 
                 @else
 
-                <div class="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4">
-                        Absensi Hari Ini Selesai
-                    </h3>
+                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                        <h3 class="text-lg font-bold text-slate-800 mb-4">
+                            Absensi Hari Ini Selesai
+                        </h3>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="p-4 bg-white rounded-2xl border">
-                            <p class="text-slate-500">Jam Masuk</p>
-                            <p class="text-xl font-bold">{{ $absensiHariIni->jam_masuk }}</p>
-                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 bg-white rounded-2xl border">
+                                <p class="text-slate-500">Jam Masuk</p>
+                                <p class="text-xl font-bold">{{ $absensiHariIni->jam_masuk }}</p>
+                            </div>
 
-                        <div class="p-4 bg-white rounded-2xl border">
-                            <p class="text-slate-500">Jam Pulang</p>
-                            <p class="text-xl font-bold">{{ $absensiHariIni->jam_pulang }}</p>
-                        </div>
+                            <div class="p-4 bg-white rounded-2xl border">
+                                <p class="text-slate-500">Jam Pulang</p>
+                                <p class="text-xl font-bold">{{ $absensiHariIni->jam_pulang }}</p>
+                            </div>
 
-                        <div class="p-4 bg-white rounded-2xl border">
-                            <p class="text-slate-500">Status Masuk</p>
-                            <p class="text-xl font-bold">{{ ucfirst($absensiHariIni->status_masuk) }}</p>
-                        </div>
+                            <div class="p-4 bg-white rounded-2xl border">
+                                <p class="text-slate-500">Status Masuk</p>
+                                <p class="text-xl font-bold">{{ ucfirst($absensiHariIni->status_masuk) }}</p>
+                            </div>
 
-                        <div class="p-4 bg-white rounded-2xl border">
-                            <p class="text-slate-500">Status Pulang</p>
-                            <p class="text-xl font-bold">
-                                {{ ucfirst(str_replace('_', ' ', $absensiHariIni->status_pulang)) }}
-                            </p>
-                        </div>
+                            <div class="p-4 bg-white rounded-2xl border">
+                                <p class="text-slate-500">Status Pulang</p>
+                                <p class="text-xl font-bold">
+                                    {{ ucfirst(str_replace('_', ' ', $absensiHariIni->status_pulang)) }}
+                                </p>
+                            </div>
 
-                        <div class="p-4 bg-white rounded-2xl border md:col-span-2">
-                            <p class="text-slate-500">Total Lembur</p>
-                            <p class="text-xl font-bold">
-                                {{ floor(($absensiHariIni->total_menit_lembur ?? 0) / 60) }}
-                                Jam
-                                {{ ($absensiHariIni->total_menit_lembur ?? 0) % 60 }}
-                                Menit
-                            </p>
+                            <div class="p-4 bg-white rounded-2xl border md:col-span-2">
+                                <p class="text-slate-500">Total Lembur</p>
+                                <p class="text-xl font-bold">
+                                    {{ floor(($absensiHariIni->total_menit_lembur ?? 0) / 60) }}
+                                    Jam
+                                    {{ ($absensiHariIni->total_menit_lembur ?? 0) % 60 }}
+                                    Menit
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
 
                 @endif
             </div>
@@ -206,7 +207,8 @@
 </div>
 
 <script>
-const formCheckin = document.getElementById('formCheckin');
+
+    const formCheckin = document.getElementById('formCheckin');
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const capture = document.getElementById('capture');
@@ -321,7 +323,8 @@ startCamera();
             },
             function () {
                 if (gpsText) gpsText.innerText = 'Gagal mengambil lokasi';
-            }, {
+            },
+            {
                 enableHighAccuracy: true,
                 timeout: 10000,
                 maximumAge: 0

@@ -52,6 +52,7 @@
 
                     <input type="hidden" name="latitude" id="latitude_masuk">
                     <input type="hidden" name="longitude" id="longitude_masuk">
+                    <input type="file" name="foto_masuk" id="foto_masuk_file" class="hidden" accept="image/*">
 
                     <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-5">
                         <div class="flex items-center justify-between mb-3">
@@ -117,6 +118,7 @@
 
                     <input type="hidden" name="latitude" id="latitude_pulang">
                     <input type="hidden" name="longitude" id="longitude_pulang">
+                    <input type="file" name="foto_pulang" id="foto_pulang_file" class="hidden" accept="image/*">
 
                     <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-5">
                         <div class="flex items-center justify-between mb-3">
@@ -427,27 +429,18 @@
                 return;
             }
 
-            const formData = new FormData(form);
-            formData.append(config.fieldName, fotoBlob, config.fileName);
+            const fileInput = document.getElementById(config.fileInputId);
 
-            fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
-                        'Accept': 'text/html'
-                    }
-                })
-                .then(response => {
-                    if (response.ok || response.redirected) {
-                        window.location.href = "{{ route('pegawai.absensi.index') }}";
-                    } else {
-                        alert('Absensi gagal dikirim.');
-                    }
-                })
-                .catch(() => {
-                    alert('Gagal mengirim absensi.');
-                });
+            const file = new File([fotoBlob], config.fileName, {
+                type: 'image/jpeg'
+            });
+
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+
+            fileInput.files = dataTransfer.files;
+
+            form.submit();
         });
 
         startCamera();
@@ -461,7 +454,7 @@
         retakeId: 'retakeMasuk',
         previewBoxId: 'previewFotoMasuk',
         previewImageId: 'previewImageMasuk',
-        fieldName: 'foto_masuk',
+        fileInputId: 'foto_masuk_file',
         fileName: 'foto_masuk.jpg'
     });
 
@@ -473,7 +466,7 @@
         retakeId: 'retakePulang',
         previewBoxId: 'previewFotoPulang',
         previewImageId: 'previewImagePulang',
-        fieldName: 'foto_pulang',
+        fileInputId: 'foto_pulang_file',
         fileName: 'foto_pulang.jpg'
     });
 </script>

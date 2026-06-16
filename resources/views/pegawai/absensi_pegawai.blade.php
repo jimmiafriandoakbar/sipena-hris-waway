@@ -440,10 +440,13 @@
                 return;
             }
 
-            const formData = new FormData(form);
-            formData.append(config.fieldName, fotoBlob, config.fileName);
+            const reader = new FileReader();
 
-            fetch(form.action, {
+            reader.onloadend = function () {
+                const formData = new FormData(form);
+                formData.append(config.fieldName, reader.result);
+
+                fetch(form.action, {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -452,19 +455,15 @@
                     }
                 })
                 .then(response => {
-                    if (response.ok || response.redirected) {
-                        window.location.href = "{{ route('pegawai.absensi.index') }}";
-                    } else {
-                        alert('Absensi gagal dikirim.');
-                    }
+                    window.location.href = "{{ route('pegawai.absensi.index') }}";
                 })
                 .catch(() => {
                     alert('Gagal mengirim absensi.');
                 });
-        });
+            };
 
-        startCamera();
-    }
+            reader.readAsDataURL(fotoBlob);
+        });
 
     setupCameraForm({
         formId: 'formCheckin',

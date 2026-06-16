@@ -72,7 +72,7 @@
                             </video>
                         </div>
 
-                        <canvas id="canvas" width="320" height="240" class="hidden"></canvas>
+                        <canvas id="canvas" width="640" height="480" class="hidden"></canvas>
 
                         <div id="previewFoto" class="hidden mt-4">
                             <p class="font-semibold text-slate-700 mb-2">
@@ -138,7 +138,7 @@
                             </video>
                         </div>
 
-                        <canvas id="canvas" width="320" height="240" class="hidden"></canvas>
+                        <canvas id="canvas" width="640" height="480" class="hidden"></canvas>
 
                         <div id="previewFoto" class="hidden mt-4">
                             <p class="font-semibold text-slate-700 mb-2">
@@ -389,7 +389,7 @@
                 canvas.height
             );
 
-            const imageData = canvas.toDataURL('image/jpeg', 0.15);
+            const imageData = canvas.toDataURL('image/jpeg', 0.5);
 
             if (fotoMasuk) fotoMasuk.value = imageData;
             if (fotoPulang) fotoPulang.value = imageData;
@@ -422,28 +422,5 @@
     }
 
     startCamera();
-
-    document.querySelectorAll('form').forEach(form => {
-
-    form.addEventListener('submit', function(e) {
-
-        const fotoMasuk = document.getElementById('foto_masuk');
-        const fotoPulang = document.getElementById('foto_pulang');
-
-        const foto =
-            (fotoMasuk ? fotoMasuk.value : '') ||
-            (fotoPulang ? fotoPulang.value : '');
-
-        if (!foto) {
-            e.preventDefault();
-            alert('Silakan ambil foto terlebih dahulu.');
-            return;
-        }
-
-        console.log('PANJANG FOTO : ', foto.length);
-        console.log('FORM SUBMIT');
-    });
-
-});
 </script>
 @endsection

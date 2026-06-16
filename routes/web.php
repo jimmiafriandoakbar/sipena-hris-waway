@@ -242,9 +242,8 @@ Route::prefix('pegawai')->name('pegawai.')->middleware(['auth','role:pegawai'])-
         ->where('path', '.*')
         ->name('absensi.foto');
 
-    Route::get('/detail-gaji', function () {
-    return view('pegawai.detail_gaji');
-})->name('detail.gaji');
+    Route::get('/detail-gaji', [PegawaiController::class, 'detailGaji'])
+        ->name('detail.gaji');
     
     // Route::get('/surat/{id}/preview', [SuratController::class, 'preview']);
     // Route::get('/surat/{id}/download', [SuratController::class, 'download'])->name('surat.download');

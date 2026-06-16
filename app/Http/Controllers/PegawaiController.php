@@ -362,4 +362,13 @@ public function absensis()
     return $this->hasMany(Absensi::class);
 }
 
+public function detailGaji()
+{
+    $pegawai = auth()->user()->pegawai;
+
+    $payroll = \App\Models\Payroll::where('pegawai_id', $pegawai->id)->first();
+
+    return view('pegawai.detail_gaji', compact('pegawai', 'payroll'));
+}
+
 }

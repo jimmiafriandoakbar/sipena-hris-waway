@@ -81,10 +81,19 @@ class AbsensiController extends Controller
 
     public function checkIn(Request $request)
     {
+        dd([
+        'masuk_controller' => true,
+        'latitude' => $request->latitude,
+        'longitude' => $request->longitude,
+        'foto_ada' => !empty($request->foto_masuk),
+        'panjang_foto' => strlen($request->foto_masuk ?? ''),
+    ]);
+
+
         $request->validate([
             'latitude' => 'nullable',
             'longitude' => 'nullable',
-            'foto_masuk' => 'required|string|max:5000000',
+            'foto_masuk' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $pegawai = Pegawai::where('user_id', Auth::id())->firstOrFail();
@@ -137,10 +146,7 @@ class AbsensiController extends Controller
             }
         }
 
-        $fotoMasuk = $this->simpanFotoBase64(
-            $request->foto_masuk,
-            'absensi/foto_masuk'
-        );
+        $fotoMasuk = $request->file('foto_masuk')->store('absensi/foto_masuk', 'public');
 
         if (!$fotoMasuk) {
             return back()->with('error', 'Foto masuk gagal disimpan. Silakan ambil foto ulang.');

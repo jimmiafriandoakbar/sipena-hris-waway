@@ -30,9 +30,8 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('admin')->name('admin.')->middleware(['auth','role:admin'])->group(function () {
 
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'admin'])
+        ->name('dashboard');
 
     Route::get('/profile-admin', function () {
         return view('admin.profile_admin');

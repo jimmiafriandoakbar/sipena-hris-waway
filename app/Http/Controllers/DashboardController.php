@@ -6,128 +6,127 @@ use App\Models\Surat;
 use App\Models\SuratMasuk;
 use App\Models\SuratTtd;
 use App\Models\Pegawai;
+use App\Models\Absensi;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function dashboard()
     {
-        // =========================
-        // PEGAWAI LOGIN
-        // =========================
-        $pegawai = Pegawai::where(
-            'user_id',
-            Auth::id()
-        )->first();
+        $pegawai = Pegawai::where('user_id', Auth::id())->firstOrFail();
 
-        // =========================
-        // SURAT MASUK BELUM DIBACA
-        // =========================
-        $suratMasuk = SuratMasuk::with(
-            'surat'
-        )
-        ->where(
-            'bagian_id',
-            $pegawai->bagian_id
-        )
-        ->where(
-            'dibaca',
-            false
-        )
-        ->get();
+        $suratMasuk = SuratMasuk::with('surat')
+            ->where('bagian_id', $pegawai->bagian_id)
+            ->where('dibaca', false)
+            ->get();
 
-        // =========================
-        // TOTAL SURAT MASUK
-        // =========================
-        $totalMasuk = SuratMasuk::where(
-            'bagian_id',
-            $pegawai->bagian_id
-        )->count();
+        $totalMasuk = SuratMasuk::where('bagian_id', $pegawai->bagian_id)
+            ->count();
 
-        // =========================
-        // SURAT KELUAR USER LOGIN
-        // =========================
-        $suratKeluar = Surat::where(
-            'user_id',
-            Auth::id()
-        )->get();
+        $suratKeluar = Surat::where('user_id', Auth::id())
+            ->get();
 
-        // total surat keluar
-        $totalKeluar = Surat::where(
-            'user_id',
-            Auth::id()
-        )->count();
+        $totalKeluar = Surat::where('user_id', Auth::id())
+            ->count();
 
-        // =========================
-        // APPROVAL PENDING
-        // =========================
-        $approval = SuratTtd::where(
-            'pegawai_id',
-            $pegawai->id
-        )
-        ->where(
-            'status',
-            'pending'
-        )
-        ->get();
+        $approval = SuratTtd::where('pegawai_id', $pegawai->id)
+            ->where('status', 'pending')
+            ->get();
 
-        // total approval pending
-        $totalApproval = SuratTtd::where(
-            'pegawai_id',
-            $pegawai->id
-        )
-        ->where(
-            'status',
-            'pending'
-        )
-        ->count();
+        $totalApproval = SuratTtd::where('pegawai_id', $pegawai->id)
+            ->where('status', 'pending')
+            ->count();
 
-        // =========================
-        // TOTAL SEMUA
-        // =========================
         $totalSemua =
-
             $totalMasuk +
-
             $totalKeluar +
-
             $totalApproval;
 
-        // =========================
-        // SURAT TERBARU
-        // =========================
         $suratTerbaru = Surat::with([
-
             'tujuan.bagian',
             'pegawai'
-
         ])
         ->whereHas('pegawai', function ($q) use ($pegawai) {
-
-            $q->where(
-                'bagian_id',
-                $pegawai->bagian_id
-            );
-
+            $q->where('bagian_id', $pegawai->bagian_id);
         })
         ->latest()
         ->paginate(5);
 
-        return view(
-            'pegawai.dashboard',
-            compact(
+        return view('pegawai.dashboard', compact(
+            'suratMasuk',
+            'suratKeluar',
+            'approval',
+            'suratTerbaru',
+            'totalMasuk',
+            'totalKeluar',
+            'totalApproval',
+            'totalSemua'
+        ));
+    }
 
-                'suratMasuk',
-                'suratKeluar',
-                'approval',
-                'suratTerbaru',
+    public function admin()
+    {
+        $today = Carbon::now('Asia/Jakarta')->toDateString();
 
-                'totalMasuk',
-                'totalKeluar',
-                'totalApproval',
-                'totalSemua'
+        $jumlahPegawai = Pegawai::count();
 
-            )
-        );
+        $pegawaiSudahAbsenMasuk = Absensi::whereDate('tanggal', $today)
+            ->whereNotNull('jam_masuk')
+            ->distinct('pegawai_id')
+            ->count('pegawai_id');
+
+        $pegawaiTidakAbsenMasuk = Pegawai::whereNotIn('id', function ($q) use ($today) {
+            $q->select('pegawai_id')
+                ->from('absensis')
+                ->whereDate('tanggal', $today)
+                ->whereNotNull('jam_masuk');
+        })->count();
+
+        $pegawaiBelumAbsenMasuk = Pegawai::with('jabatanRelasi')
+            ->whereNotIn('id', function ($q) use ($today) {
+                $q->select('pegawai_id')
+                    ->from('absensis')
+                    ->whereDate('tanggal', $today)
+                    ->whereNotNull('jam_masuk');
+            })
+            ->orderBy('nama')
+            ->get();
+
+        $pegawaiTidakAbsenPulang = Absensi::with('pegawai.jabatanRelasi')
+            ->whereDate('tanggal', $today)
+            ->whereNotNull('jam_masuk')
+            ->whereNull('jam_pulang')
+            ->orderBy('jam_masuk')
+            ->get();
+
+        $pegawaiTerlambat = Absensi::with('pegawai.jabatanRelasi')
+            ->whereDate('tanggal', $today)
+            ->where('status_masuk', 'terlambat')
+            ->orderBy('jam_masuk')
+            ->get();
+
+        $pegawaiPulangCepat = Absensi::with('pegawai.jabatanRelasi')
+            ->whereDate('tanggal', $today)
+            ->where('status_pulang', 'pulang_cepat')
+            ->orderBy('jam_pulang')
+            ->get();
+
+        $jumlahTidakAbsenPulang = $pegawaiTidakAbsenPulang->count();
+        $jumlahTerlambat = $pegawaiTerlambat->count();
+        $jumlahPulangCepat = $pegawaiPulangCepat->count();
+
+        return view('admin.dashboard', compact(
+            'jumlahPegawai',
+            'pegawaiSudahAbsenMasuk',
+            'pegawaiTidakAbsenMasuk',
+            'pegawaiBelumAbsenMasuk',
+            'pegawaiTidakAbsenPulang',
+            'pegawaiTerlambat',
+            'pegawaiPulangCepat',
+            'jumlahTidakAbsenPulang',
+            'jumlahTerlambat',
+            'jumlahPulangCepat'
+        ));
     }
 }

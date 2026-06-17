@@ -39,4 +39,9 @@ class Absensi extends Model
     {
         return $this->belongsTo(Pegawai::class);
     }
+
+    public function absensis()
+    {
+        return $this->hasMany(Absensi::class);
+    }
 }

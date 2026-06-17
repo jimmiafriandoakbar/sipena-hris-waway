@@ -226,11 +226,27 @@ class AbsensiController extends Controller
 
         $bulan = $request->bulan ?? $now->format('m');
         $tahun = $request->tahun ?? $now->format('Y');
+        $search = $request->search;
 
-        $pegawais = Pegawai::with(['jabatanRelasi', 'absensis' => function ($query) use ($bulan, $tahun) {
-            $query->whereMonth('tanggal', $bulan)
-                ->whereYear('tanggal', $tahun);
-        }])->orderBy('nama')->get();
+        $pegawais = Pegawai::with([
+            'jabatanRelasi',
+            'absensis' => function ($query) use ($bulan, $tahun) {
+                $query->whereMonth('tanggal', $bulan)
+                    ->whereYear('tanggal', $tahun);
+            }
+        ])
+        ->when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', '%' . $search . '%')
+                ->orWhere('nip', 'like', '%' . $search . '%')
+                ->orWhereHas('jabatanRelasi', function ($j) use ($search) {
+                    $j->where('nama_jabatan', 'like', '%' . $search . '%');
+                });
+            });
+        })
+        ->orderBy('nama')
+        ->paginate(10)
+        ->withQueryString();
 
         return view('admin.rekap_absensi_admin', compact(
             'pegawais',

@@ -2,133 +2,286 @@
 
 @section('content')
 
-<!-- HEADER -->
-<div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">Dashboard Pegawai</h1>
-    <p class="text-gray-500">Kelola surat masuk dan keluar dengan mudah.</p>
+<div class="mb-7 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+        <h1 class="text-3xl font-bold text-slate-800">
+            Dashboard Admin
+        </h1>
+        <p class="text-slate-500 mt-1">
+            Monitoring pegawai dan absensi hari ini.
+        </p>
+    </div>
+
+    <div class="px-5 py-3 rounded-2xl bg-white border border-slate-200 shadow-sm">
+        <p class="text-xs text-slate-500">Tanggal</p>
+        <p class="font-bold text-blue-700">
+            {{ \Carbon\Carbon::now('Asia/Jakarta')->translatedFormat('d F Y') }}
+        </p>
+    </div>
 </div>
 
-<!-- CARD STATISTIK -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-5 mb-7">
 
-    <!-- Surat Masuk -->
-    <div class="bg-white p-5 rounded-xl shadow flex items-center justify-between">
-        <div>
-            <p class="text-gray-500">Surat Masuk</p>
-            <h2 class="text-2xl font-bold">10</h2>
-        </div>
-        <div class="bg-blue-500 text-white p-3 rounded-lg">
-            <i data-lucide="inbox"></i>
-        </div>
-    </div>
-
-    <!-- Surat Keluar -->
-    <div class="bg-white p-5 rounded-xl shadow flex items-center justify-between">
-        <div>
-            <p class="text-gray-500">Surat Keluar</p>
-            <h2 class="text-2xl font-bold">5</h2>
-        </div>
-        <div class="bg-green-500 text-white p-3 rounded-lg">
-            <i data-lucide="send"></i>
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-slate-500">Total Pegawai</p>
+                <h2 class="text-3xl font-bold text-slate-800 mt-1">
+                    {{ $jumlahPegawai }}
+                </h2>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
         </div>
     </div>
 
-    <!-- Draft -->
-    <div class="bg-white p-5 rounded-xl shadow flex items-center justify-between">
-        <div>
-            <p class="text-gray-500">Draft Surat</p>
-            <h2 class="text-2xl font-bold">2</h2>
-        </div>
-        <div class="bg-yellow-500 text-white p-3 rounded-lg">
-            <i data-lucide="file-edit"></i>
-        </div>
-    </div>
-
-    <!-- Total -->
-    <div class="bg-white p-5 rounded-xl shadow flex items-center justify-between">
-        <div>
-            <p class="text-gray-500">Total Surat</p>
-            <h2 class="text-2xl font-bold">17</h2>
-        </div>
-        <div class="bg-red-500 text-white p-3 rounded-lg">
-            <i data-lucide="file-text"></i>
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-slate-500">Sudah Absen Masuk</p>
+                <h2 class="text-3xl font-bold text-emerald-600 mt-1">
+                    {{ $pegawaiSudahAbsenMasuk }}
+                </h2>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i data-lucide="check-circle" class="w-6 h-6"></i>
+            </div>
         </div>
     </div>
 
-</div>
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-slate-500">Belum Absen Masuk</p>
+                <h2 class="text-3xl font-bold text-red-600 mt-1">
+                    {{ $pegawaiTidakAbsenMasuk }}
+                </h2>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center">
+                <i data-lucide="x-circle" class="w-6 h-6"></i>
+            </div>
+        </div>
+    </div>
 
-<!-- TABEL SURAT TERBARU -->
-<div class="bg-white p-6 rounded-xl shadow">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-slate-500">Terlambat</p>
+                <h2 class="text-3xl font-bold text-orange-600 mt-1">
+                    {{ $pegawaiTerlambat->count() }}
+                </h2>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center">
+                <i data-lucide="clock" class="w-6 h-6"></i>
+            </div>
+        </div>
+    </div>
 
-    <h2 class="text-xl font-semibold mb-4">Surat Terbaru</h2>
-
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-
-            <thead>
-                <tr class="bg-gray-800 text-white">
-                    <th class="p-3">No Surat</th>
-                    <th class="p-3">Perihal</th>
-                    <th class="p-3">Tanggal</th>
-                    <th class="p-3">Jenis</th>
-                    <th class="p-3">Status</th>
-                    <th class="p-3">Aksi</th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="p-3">ND-001</td>
-                    <td class="p-3">Permohonan Dana</td>
-                    <td class="p-3">17 Apr 2026</td>
-                    <td class="p-3">Masuk</td>
-                    <td class="p-3">
-                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-                            Disetujui
-                        </span>
-                    </td>
-                    <td class="p-3 flex gap-2">
-                        <button
-                            class="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded flex items-center justify-center transition">
-                            <i data-lucide="eye" class="w-4 h-4"></i>
-                        </button>
-
-                        <button
-                            class="px-2 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded flex items-center justify-center transition">
-                            <i data-lucide="pencil" class="w-4 h-4"></i>
-                        </button>
-                    </td>
-                </tr>
-
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="p-3">ND-002</td>
-                    <td class="p-3">Laporan Bulanan</td>
-                    <td class="p-3">16 Apr 2026</td>
-                    <td class="p-3">Keluar</td>
-                    <td class="p-3">
-                        <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">
-                            Proses
-                        </span>
-                    </td>
-                    <td class="p-3 flex gap-2">
-                        <button
-                            class="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded flex items-center justify-center transition">
-                            <i data-lucide="eye" class="w-4 h-4"></i>
-                        </button>
-
-                        <button
-                            class="px-2 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded flex items-center justify-center transition">
-                            <i data-lucide="pencil" class="w-4 h-4"></i>
-                        </button>
-                    </td>
-                </tr>
-
-            </tbody>
-
-        </table>
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm text-slate-500">Pulang Cepat</p>
+                <h2 class="text-3xl font-bold text-yellow-600 mt-1">
+                    {{ $pegawaiPulangCepat->count() }}
+                </h2>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-yellow-50 text-yellow-600 flex items-center justify-center">
+                <i data-lucide="log-out" class="w-6 h-6"></i>
+            </div>
+        </div>
     </div>
 
 </div>
+
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b bg-slate-50">
+            <h2 class="font-bold text-slate-800">
+                Pegawai Belum Absen Masuk
+            </h2>
+            <p class="text-sm text-slate-500 mt-1">
+                Daftar pegawai yang belum melakukan check-in hari ini.
+            </p>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-white text-slate-500 uppercase text-xs">
+                    <tr>
+                        <th class="px-6 py-4 text-left">Nama</th>
+                        <th class="px-6 py-4 text-left">NIP</th>
+                        <th class="px-6 py-4 text-left">Jabatan</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($pegawaiBelumAbsenMasuk as $p)
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-6 py-4 font-semibold text-slate-800">
+                                {{ $p->nama }}
+                            </td>
+                            <td class="px-6 py-4 text-slate-500">
+                                {{ $p->nip ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4 text-slate-500">
+                                {{ $p->jabatanRelasi->nama_jabatan ?? '-' }}
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-6 py-8 text-center text-slate-500">
+                                Semua pegawai sudah absen masuk.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b bg-slate-50">
+            <h2 class="font-bold text-slate-800">
+                Pegawai Tidak Absen Pulang
+            </h2>
+            <p class="text-sm text-slate-500 mt-1">
+                Pegawai yang sudah masuk tetapi belum check-out.
+            </p>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-white text-slate-500 uppercase text-xs">
+                    <tr>
+                        <th class="px-6 py-4 text-left">Nama</th>
+                        <th class="px-6 py-4 text-left">Jam Masuk</th>
+                        <th class="px-6 py-4 text-left">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($pegawaiTidakAbsenPulang as $a)
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-6 py-4 font-semibold text-slate-800">
+                                {{ $a->pegawai->nama ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4 text-slate-500">
+                                {{ $a->jam_masuk ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-xs font-bold">
+                                    Belum Absen Pulang
+                                </span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-6 py-8 text-center text-slate-500">
+                                Tidak ada pegawai yang belum absen pulang.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b bg-slate-50">
+            <h2 class="font-bold text-slate-800">
+                Pegawai Terlambat
+            </h2>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-white text-slate-500 uppercase text-xs">
+                    <tr>
+                        <th class="px-6 py-4 text-left">Nama</th>
+                        <th class="px-6 py-4 text-left">Jam Masuk</th>
+                        <th class="px-6 py-4 text-left">Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($pegawaiTerlambat as $a)
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-6 py-4 font-semibold text-slate-800">
+                                {{ $a->pegawai->nama ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4 text-slate-500">
+                                {{ $a->jam_masuk ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold">
+                                    Terlambat
+                                </span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-6 py-8 text-center text-slate-500">
+                                Tidak ada pegawai terlambat.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b bg-slate-50">
+            <h2 class="font-bold text-slate-800">
+                Pegawai Pulang Cepat
+            </h2>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-white text-slate-500 uppercase text-xs">
+                    <tr>
+                        <th class="px-6 py-4 text-left">Nama</th>
+                        <th class="px-6 py-4 text-left">Jam Pulang</th>
+                        <th class="px-6 py-4 text-left">Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($pegawaiPulangCepat as $a)
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-6 py-4 font-semibold text-slate-800">
+                                {{ $a->pegawai->nama ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4 text-slate-500">
+                                {{ $a->jam_pulang ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 rounded-full bg-orange-50 text-orange-700 text-xs font-bold">
+                                    Pulang Cepat
+                                </span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-6 py-8 text-center text-slate-500">
+                                Tidak ada pegawai pulang cepat.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+</script>
 
 @endsection

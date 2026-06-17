@@ -21,69 +21,106 @@
                 Monitoring kehadiran, keterlambatan, pulang cepat, tidak absen pulang, dan lembur pegawai.
             </p>
         </div>
-
-        <div class="px-5 py-3 rounded-2xl bg-white border border-slate-200 shadow-sm">
-            <p class="text-xs text-slate-500">Periode</p>
-            <p class="font-bold text-blue-700">
-                {{ \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->translatedFormat('F Y') }}
-            </p>
-        </div>
     </div>
 
     <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 mb-6 no-print">
+
         <form method="GET"
-              action="{{ route('admin.absensi.rekap') }}"
-              class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            action="{{ route('admin.absensi.rekap') }}"
+            class="space-y-5">
 
-            <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">
-                    Bulan
-                </label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                <select name="bulan"
-                        class="w-full border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
-                    @for($i = 1; $i <= 12; $i++)
-                        <option value="{{ sprintf('%02d', $i) }}"
-                            {{ $bulan == sprintf('%02d', $i) ? 'selected' : '' }}>
-                            {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
-                        </option>
-                    @endfor
-                </select>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                        Bulan
+                    </label>
+
+                    <select name="bulan"
+                            class="w-full h-12 px-4 rounded-2xl border border-slate-300 bg-white text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition">
+                        @for($i = 1; $i <= 12; $i++)
+                            <option value="{{ sprintf('%02d', $i) }}"
+                                {{ $bulan == sprintf('%02d', $i) ? 'selected' : '' }}>
+                                {{ \Carbon\Carbon::create()->month($i)->translatedFormat('F') }}
+                            </option>
+                        @endfor
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                        Tahun
+                    </label>
+
+                    <select name="tahun"
+                            class="w-full h-12 px-4 rounded-2xl border border-slate-300 bg-white text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition">
+                        @for($y = now()->year; $y >= now()->year - 5; $y--)
+                            <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>
+                                {{ $y }}
+                            </option>
+                        @endfor
+                    </select>
+                </div>
+
             </div>
 
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-2">
-                    Tahun
+                    Cari Pegawai
                 </label>
 
-                <select name="tahun"
-                        class="w-full border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500">
-                    @for($y = now()->year; $y >= now()->year - 5; $y--)
-                        <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>
-                            {{ $y }}
-                        </option>
-                    @endfor
-                </select>
+                <div class="relative">
+                    <input type="text"
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Cari nama, NIP, atau jabatan..."
+                        class="w-full h-12 pl-11 pr-4 rounded-2xl border border-slate-300 bg-white text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition">
+
+                    <i data-lucide="search"
+                    class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                </div>
             </div>
 
-            <div>
-                <button class="w-full px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">
-                    Tampilkan
-                </button>
-            </div>
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pt-2">
 
-            <div>
-                <a href="{{ route('admin.absensi.print', [
-                        'bulan' => $bulan,
-                        'tahun' => $tahun
+                <div class="text-sm text-slate-500">
+                    Periode:
+                    <span class="font-bold text-blue-700">
+                        {{ \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->translatedFormat('F Y') }}
+                    </span>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+
+                    <button type="submit"
+                            class="h-12 px-6 rounded-2xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition shadow-sm inline-flex items-center justify-center gap-2">
+                        <i data-lucide="filter" class="w-4 h-4"></i>
+                        Tampilkan
+                    </button>
+
+                    <a href="{{ route('admin.absensi.rekap') }}"
+                    class="h-12 px-6 rounded-2xl border border-slate-300 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 transition shadow-sm inline-flex items-center justify-center gap-2">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                        Reset
+                    </a>
+
+                    <a href="{{ route('admin.absensi.print', [
+                            'bulan' => $bulan,
+                            'tahun' => $tahun,
+                            'search' => request('search')
                         ]) }}"
                     target="_blank"
-                    class="block text-center w-full px-5 py-3 rounded-xl bg-slate-800 text-white font-semibold hover:bg-slate-900 transition">
+                    class="h-12 px-6 rounded-2xl bg-slate-800 text-white text-sm font-semibold hover:bg-slate-900 transition shadow-sm inline-flex items-center justify-center gap-2">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
                         Print
-                </a>
+                    </a>
+
+                </div>
+
             </div>
 
         </form>
+
     </div>
 
     <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
@@ -96,6 +133,14 @@
                 <p class="text-sm text-slate-500">
                     Periode {{ \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->translatedFormat('F Y') }}
                 </p>
+            </div>
+
+            <div class="text-sm text-slate-500">
+                Total
+                <span class="font-bold text-slate-800">
+                    {{ method_exists($pegawais, 'total') ? $pegawais->total() : $pegawais->count() }}
+                </span>
+                pegawai
             </div>
         </div>
 
@@ -133,11 +178,21 @@
 
                             $jamLembur = floor($totalMenitLembur / 60);
                             $menitLembur = $totalMenitLembur % 60;
+
+                            $grandHadir += $totalHadir;
+                            $grandTerlambat += $totalTerlambat;
+                            $grandPulangCepat += $totalPulangCepat;
+                            $grandTidakAbsenPulang += $totalTidakAbsenPulang;
+                            $grandMenitLembur += $totalMenitLembur;
+
+                            $nomor = method_exists($pegawais, 'firstItem')
+                                ? $pegawais->firstItem() + $loop->index
+                                : $loop->iteration;
                         @endphp
 
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-4 py-4 text-slate-600">
-                                {{ $loop->iteration }}
+                                {{ $nomor }}
                             </td>
 
                             <td class="px-4 py-4">
@@ -195,8 +250,8 @@
 
                     @empty
                         <tr>
-                            <td colspan="9" class="px-4 py-8 text-center text-slate-500">
-                                Data pegawai belum tersedia.
+                            <td colspan="9" class="px-4 py-10 text-center text-slate-500">
+                                Data pegawai tidak ditemukan.
                             </td>
                         </tr>
                     @endforelse
@@ -205,7 +260,7 @@
                 <tfoot class="bg-slate-100 font-bold text-slate-800">
                     <tr>
                         <td colspan="3" class="px-4 py-4 text-center">
-                            TOTAL KESELURUHAN
+                            TOTAL HALAMAN INI
                         </td>
                         <td class="px-4 py-4 text-center">{{ $grandHadir }}</td>
                         <td class="px-4 py-4 text-center">{{ $grandTerlambat }}</td>
@@ -219,6 +274,61 @@
                 </tfoot>
             </table>
         </div>
+
+        @if(method_exists($pegawais, 'links'))
+            <div class="px-6 py-5 border-t bg-slate-50 no-print flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                <div class="text-sm text-slate-500">
+                    Menampilkan
+                    <span class="font-semibold text-slate-700">
+                        {{ $pegawais->firstItem() ?? 0 }}
+                    </span>
+                    -
+                    <span class="font-semibold text-slate-700">
+                        {{ $pegawais->lastItem() ?? 0 }}
+                    </span>
+                    dari
+                    <span class="font-semibold text-slate-700">
+                        {{ $pegawais->total() }}
+                    </span>
+                    data
+                </div>
+
+                <div class="flex items-center gap-2">
+
+                    @if($pegawais->onFirstPage())
+                        <span class="h-10 px-4 rounded-xl border border-slate-200 bg-slate-100 text-slate-400 text-sm font-semibold flex items-center gap-2 cursor-not-allowed">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                            Prev
+                        </span>
+                    @else
+                        <a href="{{ $pegawais->previousPageUrl() }}"
+                           class="h-10 px-4 rounded-xl border border-slate-300 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-100 transition flex items-center gap-2">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                            Prev
+                        </a>
+                    @endif
+
+                    <div class="h-10 px-4 rounded-xl bg-blue-600 text-white text-sm font-semibold flex items-center justify-center">
+                        Page {{ $pegawais->currentPage() }} / {{ $pegawais->lastPage() }}
+                    </div>
+
+                    @if($pegawais->hasMorePages())
+                        <a href="{{ $pegawais->nextPageUrl() }}"
+                           class="h-10 px-4 rounded-xl border border-slate-300 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-100 transition flex items-center gap-2">
+                            Next
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </a>
+                    @else
+                        <span class="h-10 px-4 rounded-xl border border-slate-200 bg-slate-100 text-slate-400 text-sm font-semibold flex items-center gap-2 cursor-not-allowed">
+                            Next
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </span>
+                    @endif
+
+                </div>
+            </div>
+        @endif
 
     </div>
 
@@ -249,5 +359,11 @@
     }
 }
 </style>
+
+<script>
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+</script>
 
 @endsection

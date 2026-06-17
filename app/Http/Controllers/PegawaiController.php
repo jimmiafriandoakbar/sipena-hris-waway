@@ -51,29 +51,93 @@ class PegawaiController extends Controller
     // ==============================
     // LIST PEGAWAI (ADMIN)
     // ==============================
-    public function indexAdmin()
+    public function indexAdmin(Request $request)
     {
-        $pegawai = Pegawai::with([
+        $query = Pegawai::with([
             'bagianRelasi',
             'jabatanRelasi'
-        ])
-        ->latest()
-        ->paginate(5);
+        ]);
 
-        return view('admin.daftarpegawai_admin', compact('pegawai'));
+        // Search
+        if ($request->filled('search')) {
+
+            $query->where(function ($q) use ($request) {
+
+                $q->where('nama', 'like', '%' . $request->search . '%')
+                ->orWhere('nip', 'like', '%' . $request->search . '%')
+                ->orWhere('email', 'like', '%' . $request->search . '%');
+
+            });
+        }
+
+        // Filter Bagian
+        if ($request->filled('bagian')) {
+
+            $query->whereHas('bagianRelasi', function ($q) use ($request) {
+
+                $q->where('nama_bagian', $request->bagian);
+
+            });
+        }
+
+        // Filter Jabatan
+        if ($request->filled('jabatan')) {
+
+            $query->whereHas('jabatanRelasi', function ($q) use ($request) {
+
+                $q->where('nama_jabatan', $request->jabatan);
+
+            });
+        }
+
+        $pegawai = $query
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        $bagians = Bagian::orderBy('nama_bagian')->get();
+        $jabatans = Jabatan::orderBy('nama_jabatan')->get();
+
+        return view(
+            'admin.daftarpegawai_admin',
+            compact(
+                'pegawai',
+                'bagians',
+                'jabatans'
+            )
+        );
     }
 
-    public function daftarGaji()
+    public function daftarGaji(Request $request)
 {
-    $pegawai = Pegawai::with([
+    $query = Pegawai::with([
         'bagianRelasi',
-        'jabatanRelasi'
-    ])
-    ->latest()
-    ->paginate(5);
+        'jabatanRelasi',
+        'payroll'
+    ]);
+
+    if ($request->filled('search')) {
+        $query->where(function ($q) use ($request) {
+            $q->where('nama', 'like', '%' . $request->search . '%')
+              ->orWhere('email', 'like', '%' . $request->search . '%')
+              ->orWhere('nomor_rekening', 'like', '%' . $request->search . '%');
+        });
+    }
+
+    if ($request->filled('jabatan')) {
+        $query->whereHas('jabatanRelasi', function ($q) use ($request) {
+            $q->where('nama_jabatan', $request->jabatan);
+        });
+    }
+
+    $pegawai = $query
+        ->latest()
+        ->paginate(5)
+        ->withQueryString();
+
     $jabatan = Jabatan::orderBy('nama_jabatan')->get();
 
-    return view('admin.daftargaji_admin', compact('pegawai','jabatan'));
+    return view('admin.daftargaji_admin', compact('pegawai', 'jabatan'));
 }
 
 public function editGaji($id)

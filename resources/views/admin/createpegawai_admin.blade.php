@@ -260,7 +260,7 @@
                 <!-- ========================= -->
                 <!-- DATA GAJI -->
                 <!-- ========================= -->
-                <div>
+                <!-- <div>
 
                     <div class="flex items-center gap-3 mb-6">
                         <div class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
@@ -321,7 +321,7 @@
                         </div>
 
                     </div>
-                </div>
+                </div> -->
 
                 <!-- ========================= -->
                 <!-- UPLOAD TTD -->

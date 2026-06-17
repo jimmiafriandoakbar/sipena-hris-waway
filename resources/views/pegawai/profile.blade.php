@@ -161,56 +161,111 @@ $p = Auth::user()->pegawai;
             </div>
 
             <!-- GAJI -->
-            <div class="bg-white rounded-2xl shadow p-6">
-                <h3 class="text-lg font-semibold mb-4">Gaji Pegawai</h3>
+            <!-- GAJI -->
+<div class="bg-white rounded-2xl shadow p-6">
 
-                @php
-                $gaji = $p->gaji_pokok ?? 0;
-                $tunj = $p->tunjangan ?? 0;
-                $bonus = $p->bonus ?? 0;
-                $pot = $p->potongan ?? 0;
-                $total = $gaji + $tunj + $bonus - $pot;
-                @endphp
+    <h3 class="text-lg font-semibold mb-4">
+        Gaji Pegawai
+    </h3>
 
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+    @php
+        $payroll = $p->payroll;
 
-                    <div class="bg-gray-50 p-3 rounded-lg">
-                        <p>Gaji Pokok</p>
-                        <b>Rp {{ number_format($gaji,0,',','.') }}</b>
-                    </div>
+        $gajiPokok = $payroll->gaji_pokok ?? 0;
 
-                    <div class="bg-gray-50 p-3 rounded-lg">
-                        <p>Tunjangan</p>
-                        <b>Rp {{ number_format($tunj,0,',','.') }}</b>
-                    </div>
+        $totalTunjangan =
+            ($payroll->tunjangan_teller ?? 0) +
+            ($payroll->tunjangan_anak ?? 0) +
+            ($payroll->tunjangan_istri ?? 0) +
+            ($payroll->tunjangan_kemahalan ?? 0) +
+            ($payroll->tunjangan_lain_lain ?? 0);
 
-                    <div class="bg-gray-50 p-3 rounded-lg">
-                        <p>Bonus</p>
-                        <b>Rp {{ number_format($bonus,0,',','.') }}</b>
-                    </div>
+        $totalPotongan =
+            ($payroll->koperasi ?? 0) +
+            ($payroll->koperasi_pinjaman ?? 0) +
+            ($payroll->infaq ?? 0) +
+            ($payroll->bpjs_kesehatan ?? 0) +
+            ($payroll->bpjs_ketenagakerjaan ?? 0) +
+            ($payroll->tabungan_pensiun ?? 0) +
+            ($payroll->pinjaman_pegawai ?? 0) +
+            ($payroll->potongan_lain_lain ?? 0);
 
-                    <div class="bg-gray-50 p-3 rounded-lg">
-                        <p>Potongan</p>
-                        <b class="text-red-500">- Rp {{ number_format($pot,0,',','.') }}</b>
-                    </div>
+        $takeHomePay =
+            $gajiPokok +
+            $totalTunjangan -
+            $totalPotongan;
+    @endphp
 
-                    <div class="bg-green-50 p-3 rounded-lg">
-                        <p>Total</p>
-                        <b class="text-green-600">Rp {{ number_format($total,0,',','.') }}</b>
-                    </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
 
-                    <div class="bg-blue-50 p-3 rounded-lg">
-                        <p>Nomor Rekening</p>
-                        <b class="text-blue-600">0011025277</b>
-                    </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-slate-500">
+                    Gaji Pokok
+                </p>
 
-                </div>
-
-                <a href="{{ route('pegawai.detail.gaji') }}"
-                    class="mt-4 inline-block px-4 py-2 bg-yellow-400 text-white rounded">
-                        Detail Gaji
-                </a>
+                <b>
+                    Rp {{ number_format($gajiPokok,0,',','.') }}
+                </b>
             </div>
+
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-slate-500">
+                    Total Tunjangan
+                </p>
+
+                <b class="text-blue-600">
+                    Rp {{ number_format($totalTunjangan,0,',','.') }}
+                </b>
+            </div>
+
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-slate-500">
+                    Total Potongan
+                </p>
+
+                <b class="text-red-500">
+                    Rp {{ number_format($totalPotongan,0,',','.') }}
+                </b>
+            </div>
+
+            <div class="bg-green-50 p-3 rounded-lg">
+                <p class="text-slate-500">
+                    Take Home Pay
+                </p>
+
+                <b class="text-green-600">
+                    Rp {{ number_format($takeHomePay,0,',','.') }}
+                </b>
+            </div>
+
+            <div class="bg-blue-50 p-3 rounded-lg">
+                <p class="text-slate-500">
+                    Nomor Rekening
+                </p>
+
+                <b class="text-blue-600">
+                    {{ $p->nomor_rekening ?? '-' }}
+                </b>
+            </div>
+
+            <div class="bg-yellow-50 p-3 rounded-lg">
+                <p class="text-slate-500">
+                    Jumlah Anak
+                </p>
+
+                <b class="text-yellow-600">
+                    {{ $payroll->jumlah_anak ?? 0 }}
+                </b>
+            </div>
+
+        </div>
+
+        <a href="{{ route('pegawai.detail.gaji') }}"
+        class="mt-4 inline-flex items-center px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl shadow-sm transition">
+            Detail Gaji
+        </a>
+
+    </div>
 
             <div class="bg-white rounded-2xl shadow p-6">
                 <h3 class="text-lg font-semibold mb-4">Ubah Password</h3>

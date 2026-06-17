@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pegawai - SIPENA</title>
+    <link rel="icon" type="image/png" href="{{ asset('Logo.png') }}">
     @vite('resources/css/app.css')
 
     <style>

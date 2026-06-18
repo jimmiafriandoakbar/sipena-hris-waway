@@ -129,22 +129,53 @@ class SuratController extends Controller
 
                 if ($user && $user->email) {
 
-                    Mail::raw(
+                    Mail::send([], [], function ($message) use ($user, $surat) {
 
-                        "Ada surat yang perlu ditandatangani.\n\n"
-                        ."Jenis Surat : Nota Dinas\n"
-                        ."Perihal : {$surat->perihal}\n"
-                        ."Nomor Surat : {$surat->nomor_surat}\n\n"
-                        ."Silakan login ke SIPENA untuk approval.",
+    $message->to($user->email)
+        ->subject('Notifikasi Surat Masuk - '.$surat->perihal)
+        ->html("
+            <h2>Notifikasi Surat Masuk</h2>
 
-                        function ($message) use ($user, $surat) {
+            <p>Yth. Bapak/Ibu,</p>
 
-                            $message->to($user->email)
-                                ->subject('Notifikasi Surat Masuk - '.$surat->perihal);
+            <p>Terdapat surat yang memerlukan persetujuan.</p>
 
-                        }
+            <table border='1' cellpadding='8' cellspacing='0'>
+                <tr>
+                    <td><b>Jenis Surat</b></td>
+                    <td>Nota Dinas</td>
+                </tr>
+                <tr>
+                    <td><b>Perihal</b></td>
+                    <td>{$surat->perihal}</td>
+                </tr>
+                <tr>
+                    <td><b>Nomor Surat</b></td>
+                    <td>{$surat->nomor_surat}</td>
+                </tr>
+            </table>
 
-                    );
+            <br>
+
+            <p>
+                Silakan login ke SIPENA untuk melakukan approval.
+            </p>
+
+            <p>
+                <a href='https://hris.bankwawaylampung.com'>
+                    Buka SIPENA
+                </a>
+            </p>
+
+            <hr>
+
+            <small>
+                Email ini dikirim otomatis oleh Sistem SIPENA Bank Waway Lampung.
+                Mohon tidak membalas email ini.
+            </small>
+        ");
+
+});
 
                 }
 

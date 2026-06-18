@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\bagian;
+use App\Models\Bagian;
 
 class BagianController extends Controller
 {

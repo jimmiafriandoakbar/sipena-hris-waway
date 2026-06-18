@@ -158,19 +158,19 @@ class SuratController extends Controller
             <br>
 
             <p>
-                Silakan login ke SIPENA untuk melakukan approval.
+                Silakan login ke HRIS BANK WAWAY untuk melakukan approval.
             </p>
 
             <p>
                 <a href='https://hris.bankwawaylampung.com'>
-                    Buka SIPENA
+                    Buka HRIS BANK WAWAY
                 </a>
             </p>
 
             <hr>
 
             <small>
-                Email ini dikirim otomatis oleh Sistem SIPENA Bank Waway Lampung.
+                Email ini dikirim otomatis oleh Sistem HRIS BANK WAWAY Bank Waway Lampung.
                 Mohon tidak membalas email ini.
             </small>
         ");
@@ -728,21 +728,53 @@ foreach (explode(',', $request->ttd) as $pegawaiId) {
 
         if ($user && $user->email) {
 
-            Mail::raw(
+            Mail::send([], [], function ($message) use ($user, $surat) {
 
-                "Ada surat yang perlu ditandatangani.\n\n"
-                ."Perihal : {$surat->perihal}\n"
-                ."Nomor Surat : {$surat->nomor_surat}\n\n"
-                ."Silakan login ke SIPENA untuk approval.",
+    $message->to($user->email)
+        ->subject('Notifikasi Surat Masuk - '.$surat->perihal)
+        ->html("
+            <h2>Notifikasi Surat Masuk</h2>
 
-                function ($message) use ($user, $surat) {
+            <p>Yth. Bapak/Ibu,</p>
 
-                    $message->to($user->email)
-                        ->subject('Notifikasi Surat Masuk - '.$surat->perihal);
+            <p>Terdapat surat yang memerlukan persetujuan.</p>
 
-                }
+            <table border='1' cellpadding='8' cellspacing='0'>
+                <tr>
+                    <td><b>Jenis Surat</b></td>
+                    <td>Nota Dinas</td>
+                </tr>
+                <tr>
+                    <td><b>Perihal</b></td>
+                    <td>{$surat->perihal}</td>
+                </tr>
+                <tr>
+                    <td><b>Nomor Surat</b></td>
+                    <td>{$surat->nomor_surat}</td>
+                </tr>
+            </table>
 
-            );
+            <br>
+
+            <p>
+                Silakan login ke HRIS BANK WAWAY untuk melakukan approval.
+            </p>
+
+            <p>
+                <a href='https://hris.bankwawaylampung.com'>
+                    Buka HRIS BANK WAWAY
+                </a>
+            </p>
+
+            <hr>
+
+            <small>
+                Email ini dikirim otomatis oleh Sistem HRIS BANK WAWAY Bank Waway Lampung.
+                Mohon tidak membalas email ini.
+            </small>
+        ");
+
+});
 
         }
 
@@ -1140,21 +1172,47 @@ Jumlah Tenaga Kerja :
 
             if ($user && $user->email) {
 
-                Mail::raw(
+               Mail::send([], [], function ($message) use ($user, $surat) {
 
-                    "Ada form lembur yang perlu ditandatangani.\n\n"
-                    ."Perihal : {$surat->perihal}\n"
-                    ."Nomor Surat : {$surat->nomor_surat}\n\n"
-                    ."Silakan login ke SIPENA untuk approval.",
+    $message->to($user->email)
+        ->subject('Notifikasi Form Lembur - '.$surat->nomor_surat)
+        ->html("
+            <h2>Notifikasi Form Lembur</h2>
 
-                    function ($message) use ($user, $surat) {
+            <p>Yth. Bapak/Ibu,</p>
 
-                        $message->to($user->email)
-                            ->subject('Notifikasi Form Lembur - '.$surat->nomor_surat);
+            <p>Terdapat form lembur yang memerlukan persetujuan.</p>
 
-                    }
+            <table border='1' cellpadding='8' cellspacing='0'>
+                <tr>
+                    <td><b>Perihal</b></td>
+                    <td>{$surat->perihal}</td>
+                </tr>
+                <tr>
+                    <td><b>Nomor Surat</b></td>
+                    <td>{$surat->nomor_surat}</td>
+                </tr>
+            </table>
 
-                );
+            <br>
+
+            <p>Silakan login ke HRIS BANK WAWAY untuk melakukan approval.</p>
+
+            <p>
+                <a href='https://hris.bankwawaylampung.com'>
+                    Buka HRIS BANK WAWAY
+                </a>
+            </p>
+
+            <hr>
+
+            <small>
+                Email ini dikirim otomatis oleh Sistem HRIS BANK WAWAY.
+                Mohon tidak membalas email ini.
+            </small>
+        ");
+
+});
 
             }
 

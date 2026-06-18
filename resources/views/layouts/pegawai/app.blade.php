@@ -1,48 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pegawai - SIPENA</title>
+
     <link rel="icon" type="image/png" href="{{ asset('Logo.png') }}">
-    @vite('resources/css/app.css')
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-@media print {
+        @media print {
 
-    @page {
-        size: A4;
-        margin: 25mm 20mm;
-    }
+            @page {
+                size: A4;
+                margin: 25mm 20mm;
+            }
 
-    body {
-        font-family: Arial, sans-serif;
-        color: #000;
-    }
+            body {
+                font-family: Arial, sans-serif;
+                color: #000;
+            }
 
-    /* SEMBUNYIKAN SEMUA */
-    body * {
-        display: none !important;
-    }
+            body * {
+                display: none !important;
+            }
 
-    /* TAMPILKAN HANYA PRINT AREA */
-    #printArea, #printArea * {
-        display: block !important;
-    }
+            #printArea,
+            #printArea * {
+                display: block !important;
+            }
 
-    #printArea {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-    }
-
-}
-</style>
+            #printArea {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100">
+
+    <!-- MOBILE TOPBAR -->
+    <div class="md:hidden fixed top-0 left-0 right-0 z-40 bg-slate-900 text-white px-4 py-3 flex items-center justify-between shadow">
+        <h1 class="font-bold">HRIS-WAWAY</h1>
+
+        <button onclick="toggleSidebar()">
+            <i data-lucide="menu"></i>
+        </button>
+    </div>
+
+    <!-- OVERLAY -->
+    <div id="sidebarOverlay"
+        onclick="toggleSidebar()"
+        class="hidden fixed inset-0 bg-black/50 z-40 md:hidden">
+    </div>
 
     <div class="flex">
 
@@ -50,16 +65,29 @@
         @include('layouts.pegawai.sidebar')
 
         <!-- CONTENT -->
-        <main class="ml-64 p-6 w-full">
+        <main class="w-full md:ml-64 p-4 md:p-6 pt-20 md:pt-6">
             @yield('content')
         </main>
 
     </div>
 
-    <!-- 🔥 TARUH DI SINI -->
     <script src="https://unpkg.com/lucide@latest"></script>
+
     <script>
         lucide.createIcons();
+
+        function toggleSidebar() {
+
+            const sidebar =
+                document.getElementById('sidebar');
+
+            const overlay =
+                document.getElementById('sidebarOverlay');
+
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+
+        }
     </script>
 
 </body>

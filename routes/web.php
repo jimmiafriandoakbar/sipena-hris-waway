@@ -263,5 +263,9 @@ Route::post('/admin/update-password', [App\Http\Controllers\AdminController::cla
 Route::post('/pegawai/ttd', [ProfileController::class, 'storeTTD'])
     ->name('pegawai.ttd.store');
 
+Route::get('/cekip', function () {
+    return request()->ip();
+});
+
 require __DIR__.'/auth.php';
 

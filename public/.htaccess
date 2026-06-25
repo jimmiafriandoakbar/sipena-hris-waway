@@ -6,8 +6,8 @@
     RewriteEngine On
 
     # Hanya izinkan IP kantor
-    RewriteCond %{REMOTE_ADDR} !^110\.137\.38\.123$
-    RewriteRule ^ - [F,L]
+    # RewriteCond %{REMOTE_ADDR} !^110\.137\.38\.123$
+    # RewriteRule ^ - [F,L]
 
     RewriteCond %{HTTPS} !=on
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

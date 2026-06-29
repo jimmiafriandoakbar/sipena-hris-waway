@@ -221,92 +221,111 @@ class AbsensiController extends Controller
     }
 
     public function rekapAdmin(Request $request)
-    {
-        $now = Carbon::now('Asia/Jakarta');
-
-        $bulan = $request->bulan ?? $now->format('m');
-        $tahun = $request->tahun ?? $now->format('Y');
-        $search = $request->search;
-
-        $pegawais = Pegawai::with([
-            'jabatanRelasi',
-            'absensis' => function ($query) use ($bulan, $tahun) {
-                $query->whereMonth('tanggal', $bulan)
-                    ->whereYear('tanggal', $tahun);
-            }
-        ])
-        ->when($search, function ($query) use ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', '%' . $search . '%')
-                ->orWhere('nip', 'like', '%' . $search . '%')
-                ->orWhereHas('jabatanRelasi', function ($j) use ($search) {
-                    $j->where('nama_jabatan', 'like', '%' . $search . '%');
-                });
-            });
-        })
-        ->orderBy('nama')
-        ->paginate(10)
-        ->withQueryString();
-
-        return view('admin.rekap_absensi_admin', compact(
-            'pegawais',
-            'bulan',
-            'tahun'
-        ));
-    }
-
-    public function detailAdmin(Request $request, Pegawai $pegawai)
-    {
-        $now = Carbon::now('Asia/Jakarta');
-
-        $bulan = $request->bulan ?? $now->format('m');
-        $tahun = $request->tahun ?? $now->format('Y');
-
-        $absensis = Absensi::where('pegawai_id', $pegawai->id)
-            ->whereMonth('tanggal', $bulan)
-            ->whereYear('tanggal', $tahun)
-            ->orderBy('tanggal', 'asc')
-            ->get();
-
-        return view('admin.detail_absensi_admin', compact(
-            'pegawai',
-            'absensis',
-            'bulan',
-            'tahun'
-        ));
-    }
-
-    public function lihatFoto($path)
-        {
-            if (!Storage::disk('public')->exists($path)) {
-                abort(404);
-            }
-
-            return response()->file(
-                storage_path('app/public/' . $path)
-            );
-        }
-
-        public function printAdmin(Request $request)
 {
-    $bulan = $request->bulan ?? now()->format('m');
-    $tahun = $request->tahun ?? now()->year;
+    $now = Carbon::now('Asia/Jakarta');
 
-    $jumlahHari = \Carbon\Carbon::create($tahun, $bulan, 1)->daysInMonth;
+    $tanggalMulai = $request->tanggal_mulai ?? $now->copy()->startOfMonth()->toDateString();
+    $tanggalSelesai = $request->tanggal_selesai ?? $now->copy()->endOfMonth()->toDateString();
+    $search = $request->search;
 
-    $pegawais = Pegawai::with(['absensis' => function ($query) use ($bulan, $tahun) {
-        $query->whereMonth('tanggal', $bulan)
-              ->whereYear('tanggal', $tahun);
-    }])
+    $pegawais = Pegawai::with([
+        'jabatanRelasi',
+        'absensis' => function ($query) use ($tanggalMulai, $tanggalSelesai) {
+            $query->whereBetween('tanggal', [$tanggalMulai, $tanggalSelesai])
+                ->orderBy('tanggal', 'asc');
+        }
+    ])
+    ->when($search, function ($query) use ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('nama', 'like', '%' . $search . '%')
+              ->orWhere('nip', 'like', '%' . $search . '%')
+              ->orWhereHas('jabatanRelasi', function ($j) use ($search) {
+                  $j->where('nama_jabatan', 'like', '%' . $search . '%');
+              });
+        });
+    })
+    ->orderBy('nama')
+    ->paginate(10)
+    ->withQueryString();
+
+    return view('admin.rekap_absensi_admin', compact(
+        'pegawais',
+        'tanggalMulai',
+        'tanggalSelesai',
+        'search'
+    ));
+}
+
+public function detailAdmin(Request $request, Pegawai $pegawai)
+{
+    $now = Carbon::now('Asia/Jakarta');
+
+    $tanggalMulai = $request->tanggal_mulai ?? $now->copy()->startOfMonth()->toDateString();
+    $tanggalSelesai = $request->tanggal_selesai ?? $now->copy()->endOfMonth()->toDateString();
+
+    $absensis = Absensi::where('pegawai_id', $pegawai->id)
+        ->whereBetween('tanggal', [$tanggalMulai, $tanggalSelesai])
+        ->orderBy('tanggal', 'asc')
+        ->get();
+
+    return view('admin.detail_absensi_admin', compact(
+        'pegawai',
+        'absensis',
+        'tanggalMulai',
+        'tanggalSelesai'
+    ));
+}
+
+public function printAdmin(Request $request)
+{
+    $now = Carbon::now('Asia/Jakarta');
+
+    $tanggalMulai = $request->tanggal_mulai ?? $now->copy()->startOfMonth()->toDateString();
+    $tanggalSelesai = $request->tanggal_selesai ?? $now->copy()->endOfMonth()->toDateString();
+    $search = $request->search;
+
+    $tanggalAwal = Carbon::parse($tanggalMulai);
+    $tanggalAkhir = Carbon::parse($tanggalSelesai);
+
+    $daftarTanggal = [];
+
+    for ($date = $tanggalAwal->copy(); $date->lte($tanggalAkhir); $date->addDay()) {
+        $daftarTanggal[] = $date->copy();
+    }
+
+    $pegawais = Pegawai::with([
+        'jabatanRelasi',
+        'absensis' => function ($query) use ($tanggalMulai, $tanggalSelesai) {
+            $query->whereBetween('tanggal', [$tanggalMulai, $tanggalSelesai])
+                ->orderBy('tanggal', 'asc');
+        }
+    ])
+    ->when($search, function ($query) use ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('nama', 'like', '%' . $search . '%')
+              ->orWhere('nip', 'like', '%' . $search . '%')
+              ->orWhereHas('jabatanRelasi', function ($j) use ($search) {
+              });
+        });
+    })
     ->orderBy('nama')
     ->get();
 
     return view('admin.printabsen_admin', compact(
         'pegawais',
-        'bulan',
-        'tahun',
-        'jumlahHari'
+        'tanggalMulai',
+        'tanggalSelesai',
+        'daftarTanggal'
     ));
+}
+
+public function lihatFoto($path)
+{
+    if (!Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+
+    return response()->file(storage_path('app/public/' . $path));
 }
 
 }

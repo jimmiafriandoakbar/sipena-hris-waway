@@ -156,10 +156,6 @@
                                     nomor_rekening: @json($p->nomor_rekening),
                                     email: @json($p->email),
                                     no_hp: @json($p->no_hp),
-                                    gaji_pokok: @json($p->gaji_pokok),
-                                    tunjangan: @json($p->tunjangan),
-                                    bonus: @json($p->bonus),
-                                    potongan: @json($p->potongan),
                                     created_at: @json(optional($p->created_at)->format("d-m-Y H:i"))
                                 })'
                                 class="h-9 px-4 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition text-xs font-medium">
@@ -267,35 +263,6 @@
                 </div>
             </div>
 
-            <div>
-                <div class="flex items-center gap-3 mb-5">
-                    <div class="w-1.5 h-6 rounded-full bg-yellow-500"></div>
-                    <h3 class="text-sm font-semibold tracking-wide uppercase text-slate-700">Data Gaji</h3>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-                    <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-5">
-                        <p class="text-xs text-emerald-600 mb-2 uppercase tracking-wide">Gaji Pokok</p>
-                        <h3 class="text-2xl font-bold text-emerald-700">Rp <span id="detailGaji"></span></h3>
-                    </div>
-
-                    <div class="rounded-2xl bg-blue-50 border border-blue-100 p-5">
-                        <p class="text-xs text-blue-600 mb-2 uppercase tracking-wide">Tunjangan</p>
-                        <h3 class="text-2xl font-bold text-blue-700">Rp <span id="detailTunjangan"></span></h3>
-                    </div>
-
-                    <div class="rounded-2xl bg-yellow-50 border border-yellow-100 p-5">
-                        <p class="text-xs text-yellow-600 mb-2 uppercase tracking-wide">Bonus</p>
-                        <h3 class="text-2xl font-bold text-yellow-700">Rp <span id="detailBonus"></span></h3>
-                    </div>
-
-                    <div class="rounded-2xl bg-red-50 border border-red-100 p-5">
-                        <p class="text-xs text-red-600 mb-2 uppercase tracking-wide">Potongan</p>
-                        <h3 class="text-2xl font-bold text-red-700">Rp <span id="detailPotongan"></span></h3>
-                    </div>
-                </div>
-            </div>
-
         </div>
 
         <div class="sticky bottom-0 bg-white border-t px-8 py-5 flex justify-end">
@@ -344,18 +311,6 @@ function openDetailModal(p) {
     document.getElementById('detailRekening').innerText = p.nomor_rekening ?? '-';
     document.getElementById('detailEmail').innerText = p.email ?? '-';
     document.getElementById('detailHp').innerText = p.no_hp ?? '-';
-
-    document.getElementById('detailGaji').innerText =
-        new Intl.NumberFormat('id-ID').format(p.gaji_pokok ?? 0);
-
-    document.getElementById('detailTunjangan').innerText =
-        new Intl.NumberFormat('id-ID').format(p.tunjangan ?? 0);
-
-    document.getElementById('detailBonus').innerText =
-        new Intl.NumberFormat('id-ID').format(p.bonus ?? 0);
-
-    document.getElementById('detailPotongan').innerText =
-        new Intl.NumberFormat('id-ID').format(p.potongan ?? 0);
 
     document.getElementById('detailCreated').innerText = p.created_at ?? '-';
 

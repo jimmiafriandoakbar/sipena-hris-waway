@@ -13,6 +13,11 @@ use App\Models\Jabatan;
 use App\Exports\GajiExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Payroll;
+use App\Models\RiwayatPekerjaan;
+use App\Models\RiwayatPelatihan;
+use App\Models\RiwayatPenghargaan;
+use App\Models\RiwayatHukuman;
+use App\Models\RiwayatDokumen;
 
 class PegawaiController extends Controller
 {
@@ -435,4 +440,166 @@ public function detailGaji()
     return view('pegawai.detail_gaji', compact('pegawai', 'payroll'));
 }
 
+public function riwayatpegawai(Request $request)
+{
+    $search = $request->search;
+
+    $pegawais = Pegawai::with(['jabatanRelasi', 'bagianRelasi'])
+        ->when($search, function ($query) use ($search) {
+            $query->where('nama', 'like', "%{$search}%")
+                ->orWhere('nip', 'like', "%{$search}%")
+                ->orWhereHas('jabatanRelasi', function ($q) use ($search) {
+                    $q->where('nama_jabatan', 'like', "%{$search}%");
+                })
+                ->orWhereHas('bagianRelasi', function ($q) use ($search) {
+                    $q->where('nama_bagian', 'like', "%{$search}%");
+                });
+        })
+        ->orderBy('nama', 'asc')
+        ->paginate(10)
+        ->appends($request->query());
+
+    return view('admin.riwayatpegawai_admin', compact('pegawais'));
+}
+
+public function detailRiwayat(Pegawai $pegawai)
+{
+    $pegawai->load([
+        'jabatanRelasi',
+        'bagianRelasi',
+    ]);
+
+    return view('admin.detail_riwayat_admin', compact('pegawai'));
+}
+
+public function detailRiwayatPegawai(Pegawai $pegawai)
+{
+    $pegawai->load([
+        'jabatanRelasi',
+        'bagianRelasi',
+        'riwayatPekerjaan',
+        'riwayatPelatihan',
+        'riwayatPenghargaan',
+        'riwayatHukuman',
+        'riwayatDokumen',
+    ]);
+
+    return view('admin.detail_riwayat_admin', compact('pegawai'));
+}
+
+public function storeRiwayatPekerjaan(Request $request, Pegawai $pegawai)
+{
+    $request->validate([
+        'perusahaan' => 'required|string|max:255',
+        'jabatan' => 'required|string|max:255',
+        'tahun' => 'nullable|digits:4',
+        'jangka_waktu' => 'nullable|string|max:100',
+    ]);
+
+    RiwayatPekerjaan::create([
+        'pegawai_id' => $pegawai->id,
+        'perusahaan' => $request->perusahaan,
+        'jabatan' => $request->jabatan,
+        'tahun' => $request->tahun,
+        'jangka_waktu' => $request->jangka_waktu,
+    ]);
+
+    return back()->with('success', 'Riwayat pekerjaan berhasil ditambahkan.');
+}
+
+public function storeRiwayatPelatihan(Request $request, Pegawai $pegawai)
+{
+    $request->validate([
+        'pelatihan' => 'required|string|max:255',
+        'tempat' => 'nullable|string|max:255',
+        'tanggal' => 'nullable|date',
+        'sertifikat' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+    ]);
+
+    $filePath = null;
+
+    if ($request->hasFile('sertifikat')) {
+        $filePath = $request->file('sertifikat')->store('riwayat/pelatihan', 'public');
+    }
+
+    RiwayatPelatihan::create([
+        'pegawai_id' => $pegawai->id,
+        'pelatihan' => $request->pelatihan,
+        'tempat' => $request->tempat,
+        'tanggal' => $request->tanggal,
+        'sertifikat' => $filePath,
+    ]);
+
+    return back()->with('success', 'Riwayat pelatihan berhasil ditambahkan.');
+}
+
+public function storeRiwayatPenghargaan(Request $request, Pegawai $pegawai)
+{
+    $request->validate([
+        'award' => 'required|string|max:255',
+        'tahun' => 'nullable|digits:4',
+        'tempat' => 'nullable|string|max:255',
+        'sertifikat' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+    ]);
+
+    $filePath = null;
+
+    if ($request->hasFile('sertifikat')) {
+        $filePath = $request->file('sertifikat')->store('riwayat/penghargaan', 'public');
+    }
+
+    RiwayatPenghargaan::create([
+        'pegawai_id' => $pegawai->id,
+        'award' => $request->award,
+        'tahun' => $request->tahun,
+        'tempat' => $request->tempat,
+        'sertifikat' => $filePath,
+    ]);
+
+    return back()->with('success', 'Riwayat penghargaan berhasil ditambahkan.');
+}
+
+public function storeRiwayatHukuman(Request $request, Pegawai $pegawai)
+    {
+        $request->validate([
+            'jenis_sp' => 'required|string|max:50',
+            'tanggal' => 'nullable|date',
+            'keterangan' => 'nullable|string',
+            'file_path' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
+
+        $filePath = null;
+
+        if ($request->hasFile('file_path')) {
+            $filePath = $request->file('file_path')->store('riwayat/hukuman', 'public');
+        }
+
+        RiwayatHukuman::create([
+            'pegawai_id' => $pegawai->id,
+            'jenis_sp' => $request->jenis_sp,
+            'tanggal' => $request->tanggal,
+            'keterangan' => $request->keterangan,
+            'file_path' => $filePath,
+        ]);
+
+        return back()->with('success', 'Riwayat hukuman berhasil ditambahkan.');
+    }
+
+public function storeRiwayatDokumen(Request $request, Pegawai $pegawai)
+{
+    $request->validate([
+        'jenis_dokumen' => 'required|string|max:100',
+        'file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+    ]);
+
+    $filePath = $request->file('file')->store('riwayat/dokumen', 'public');
+
+    RiwayatDokumen::create([
+        'pegawai_id' => $pegawai->id,
+        'jenis_dokumen' => $request->jenis_dokumen,
+        'file' => $filePath,
+    ]);
+
+    return back()->with('success', 'Dokumen pendukung berhasil diupload.');
+}
 }

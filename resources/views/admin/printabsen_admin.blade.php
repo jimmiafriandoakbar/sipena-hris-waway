@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
-    <title>Rekap Absensi Bulanan</title>
+    <title>Print Rekap Absensi</title>
 
     <style>
-        @page {
-            size: A4 landscape;
-            margin: 5mm;
-        }
+        @page { size: A4 landscape; margin: 5mm; }
 
         body {
             font-family: Arial, sans-serif;
@@ -17,8 +13,7 @@
             color: #000;
         }
 
-        h2,
-        h4 {
+        h2, h4 {
             text-align: center;
             margin: 0;
         }
@@ -33,8 +28,7 @@
             border-collapse: collapse;
         }
 
-        th,
-        td {
+        th, td {
             border: 1px solid #cbd5e1;
             padding: 1px;
             text-align: center;
@@ -46,6 +40,8 @@
             font-size: 7px;
             font-weight: bold;
         }
+
+        .no { width: 25px; }
 
         .nama {
             text-align: left;
@@ -67,16 +63,14 @@
             min-width: 18px;
             font-size: 6px;
             line-height: 1.1;
-            color: #64748b;
             white-space: nowrap;
         }
 
-        .masuk {
+        .masuk, .pulang {
             display: block;
         }
 
         .pulang {
-            display: block;
             margin-top: 1px;
         }
 
@@ -87,149 +81,117 @@
             font-weight: bold;
         }
 
-        .no {
-            width: 25px;
-        }
-
         .btn-print {
             margin-bottom: 10px;
         }
 
         @media print {
-            .btn-print {
-                display: none;
-            }
+            .btn-print { display: none; }
         }
     </style>
 </head>
 
 <body>
 
-    <div class="btn-print">
-        <button onclick="window.print()">
-            Print
-        </button>
-    </div>
+<div class="btn-print">
+    <button onclick="window.print()">Print</button>
+</div>
 
-    <h2>REKAP ABSENSI PEGAWAI</h2>
+<h2>REKAP ABSENSI PEGAWAI</h2>
+<h4>
+    Periode
+    {{ \Carbon\Carbon::parse($tanggalMulai)->format('d/m/Y') }}
+    s/d
+    {{ \Carbon\Carbon::parse($tanggalSelesai)->format('d/m/Y') }}
+</h4>
 
-    <h4>
-        Bulan
-        {{ \Carbon\Carbon::create()->month((int)$bulan)->translatedFormat('F') }}
-        Tahun {{ $tahun }}
-    </h4>
+<table>
+    <thead>
+        <tr>
+            <th class="no">No</th>
+            <th class="nama">Nama Pegawai</th>
 
-    <table>
-
-        <thead>
-            <tr>
-
-                <th class="no">No</th>
-
-                <th class="nama">
-                    Nama Pegawai
+            @foreach($daftarTanggal as $tgl)
+                <th class="tanggal">
+                    {{ $tgl->format('d') }}<br>
+                    {{ $tgl->translatedFormat('D') }}
                 </th>
-
-                @for($i = 1; $i <= $jumlahHari; $i++)
-                    <th class="tanggal">
-                        {{ $i }}
-                    </th>
-                @endfor
-
-                <th class="total">
-                    Hadir
-                </th>
-
-            </tr>
-        </thead>
-
-        <tbody>
-
-            @foreach($pegawais as $pegawai)
-
-                @php
-                    $totalHadir = 0;
-                @endphp
-
-                <tr>
-
-                    <td>
-                        {{ $loop->iteration }}
-                    </td>
-
-                    <td class="nama">
-                        {{ $pegawai->nama }}
-                    </td>
-
-                    @for($i = 1; $i <= $jumlahHari; $i++)
-
-                        @php
-
-                            $tanggal = \Carbon\Carbon::create(
-                                $tahun,
-                                $bulan,
-                                $i
-                            )->toDateString();
-
-                            $absen = $pegawai->absensis
-                                ->firstWhere('tanggal', $tanggal);
-
-                            if ($absen && $absen->jam_masuk) {
-                                $totalHadir++;
-                            }
-
-                        @endphp
-
-                        <td class="jam">
-
-                            @if($absen && $absen->jam_masuk)
-
-                                <span class="masuk">
-                                    {{ \Carbon\Carbon::parse($absen->jam_masuk)->format('H:i') }}
-                                </span>
-
-                                <span class="pulang">
-
-                                    @if($absen->jam_pulang)
-
-                                        {{ \Carbon\Carbon::parse($absen->jam_pulang)->format('H:i') }}
-
-                                    @else
-
-                                        -
-
-                                    @endif
-
-                                </span>
-
-                            @else
-
-                                -
-
-                            @endif
-
-                        </td>
-
-                    @endfor
-
-                    <td class="total">
-                        {{ $totalHadir }}
-                    </td>
-
-                </tr>
-
             @endforeach
 
-        </tbody>
+            <th class="total">Hadir</th>
+            <th class="total">Telat</th>
+            <th class="total">PC</th>
+            <th class="total">Lembur</th>
+        </tr>
+    </thead>
 
-    </table>
+    <tbody>
+        @foreach($pegawais as $pegawai)
+            @php
+                $totalHadir = 0;
+                $totalTelat = 0;
+                $totalPulangCepat = 0;
+                $totalMenitLembur = 0;
+            @endphp
 
-    <script>
-        window.onload = function() {
-            window.print();
-        }
-    </script>
+            <tr>
+                <td>{{ $loop->iteration }}</td>
+
+                <td class="nama">{{ $pegawai->nama }}</td>
+
+                @foreach($daftarTanggal as $tgl)
+                    @php
+                        $tanggal = $tgl->toDateString();
+                        $absen = $pegawai->absensis->firstWhere('tanggal', $tanggal);
+
+                        if ($absen && $absen->jam_masuk) {
+                            $totalHadir++;
+                        }
+
+                        if ($absen && $absen->status_masuk == 'terlambat') {
+                            $totalTelat++;
+                        }
+
+                        if ($absen && $absen->status_pulang == 'pulang_cepat') {
+                            $totalPulangCepat++;
+                        }
+
+                        if ($absen) {
+                            $totalMenitLembur += $absen->total_menit_lembur ?? 0;
+                        }
+                    @endphp
+
+                    <td class="jam">
+                        @if($absen && $absen->jam_masuk)
+                            <span class="masuk">
+                                {{ \Carbon\Carbon::parse($absen->jam_masuk)->format('H:i') }}
+                            </span>
+
+                            <span class="pulang">
+                                {{ $absen->jam_pulang ? \Carbon\Carbon::parse($absen->jam_pulang)->format('H:i') : '-' }}
+                            </span>
+                        @else
+                            -
+                        @endif
+                    </td>
+                @endforeach
+
+                <td class="total">{{ $totalHadir }}</td>
+                <td class="total">{{ $totalTelat }}</td>
+                <td class="total">{{ $totalPulangCepat }}</td>
+                <td class="total">
+                    {{ floor($totalMenitLembur / 60) }}j {{ $totalMenitLembur % 60 }}m
+                </td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+
+<script>
+    window.onload = function() {
+        window.print();
+    }
+</script>
 
 </body>
-
 </html>

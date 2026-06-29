@@ -244,105 +244,6 @@
 
                     </div>
 
-
-                    <!-- ========================= -->
-                    <!-- DATA GAJI -->
-                    <!-- ========================= -->
-                    <div class="mb-6">
-
-                        <div class="flex items-center gap-3 mb-6 ">
-
-                            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-600" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3
-                    3-1.343 3-3-1.343-3-3-3z" />
-
-                                </svg>
-
-                            </div>
-
-                            <div>
-
-                                <h3 class="text-lg font-semibold text-slate-800">
-                                    Data Gaji
-                                </h3>
-
-                                <p class="text-sm text-slate-500">
-                                    Informasi penghasilan pegawai
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-
-                            <!-- GAJI POKOK -->
-                            <div>
-
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    Gaji Pokok
-                                </label>
-
-                                <input type="number" name="gaji_pokok"
-                                    value="{{ old('gaji_pokok', $pegawai->gaji_pokok) }}"
-                                    placeholder="Masukkan gaji pokok" class="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white
-                focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500
-                transition duration-200 text-sm outline-none shadow-sm">
-
-                            </div>
-
-                            <!-- TUNJANGAN -->
-                            <div>
-
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    Tunjangan
-                                </label>
-
-                                <input type="number" name="tunjangan"
-                                    value="{{ old('tunjangan', $pegawai->tunjangan) }}" placeholder="Masukkan tunjangan"
-                                    class="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white
-                focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500
-                transition duration-200 text-sm outline-none shadow-sm">
-
-                            </div>
-
-                            <!-- BONUS -->
-                            <div>
-
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    Bonus
-                                </label>
-
-                                <input type="number" name="bonus" value="{{ old('bonus', $pegawai->bonus) }}"
-                                    placeholder="Masukkan bonus" class="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white
-                focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500
-                transition duration-200 text-sm outline-none shadow-sm">
-
-                            </div>
-
-                            <!-- POTONGAN -->
-                            <div>
-
-                                <label class="block text-sm font-medium text-slate-700 mb-2">
-                                    Potongan
-                                </label>
-
-                                <input type="number" name="potongan" value="{{ old('potongan', $pegawai->potongan) }}"
-                                    placeholder="Masukkan potongan" class="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white
-                focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500
-                transition duration-200 text-sm outline-none shadow-sm">
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
                     <!-- ========================= -->
                     <!-- UPLOAD TTD -->
                     <!-- ========================= -->
@@ -439,7 +340,7 @@
                             </p>
 
                             <p class="text-xs text-slate-500 mt-1">
-                                Perubahan data akan langsung tersimpan ke sistem SIPENA.
+                                Perubahan data akan langsung tersimpan ke sistem HRIS.
                             </p>
 
                         </div>

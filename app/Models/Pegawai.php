@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Jabatan;
 use App\Models\Bagian;
 use App\Models\Payroll;
+use App\Models\RiwayatPekerjaan;
+use App\Models\RiwayatPelatihan;
+use App\Models\RiwayatPenghargaan;
+use App\Models\RiwayatHukuman;
+use App\Models\RiwayatDokumen;
 
 class Pegawai extends Model
 {
@@ -59,6 +64,31 @@ public function payroll()
 public function absensis()
 {
     return $this->hasMany(Absensi::class);
+}
+
+public function riwayatPekerjaan()
+{
+    return $this->hasMany(RiwayatPekerjaan::class);
+}
+
+public function riwayatPelatihan()
+{
+    return $this->hasMany(RiwayatPelatihan::class);
+}
+
+public function riwayatPenghargaan()
+{
+    return $this->hasMany(RiwayatPenghargaan::class);
+}
+
+public function riwayatHukuman()
+{
+    return $this->hasMany(RiwayatHukuman::class);
+}
+
+public function riwayatDokumen()
+{
+    return $this->hasMany(RiwayatDokumen::class);
 }
 
 }

@@ -113,6 +113,33 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','role:admin'])->group
     Route::get('/absensi/print', [AbsensiController::class, 'printAdmin'])
     ->name('absensi.print');
 
+    Route::get('/riwayat-pegawai', [PegawaiController::class, 'riwayatpegawai'])
+    ->name('riwayat.pegawai');
+
+    Route::get('/riwayat-pegawai/{pegawai}', [PegawaiController::class, 'detailRiwayat'])
+    ->name('riwayat.pegawai.detail');
+
+    Route::get('/riwayat-pegawai', [PegawaiController::class, 'riwayatpegawai'])
+        ->name('riwayat.pegawai');
+
+    Route::get('/riwayat-pegawai/{pegawai}', [PegawaiController::class, 'detailRiwayatPegawai'])
+        ->name('riwayat.pegawai.detail');
+
+    Route::post('/riwayat-pegawai/{pegawai}/pekerjaan', [PegawaiController::class, 'storeRiwayatPekerjaan'])
+        ->name('riwayat.pegawai.pekerjaan.store');
+
+    Route::post('/riwayat-pegawai/{pegawai}/pelatihan', [PegawaiController::class, 'storeRiwayatPelatihan'])
+        ->name('riwayat.pegawai.pelatihan.store');
+
+    Route::post('/riwayat-pegawai/{pegawai}/penghargaan', [PegawaiController::class, 'storeRiwayatPenghargaan'])
+        ->name('riwayat.pegawai.penghargaan.store');
+
+    Route::post('/riwayat-pegawai/{pegawai}/hukuman', [PegawaiController::class, 'storeRiwayatHukuman'])
+        ->name('riwayat.pegawai.hukuman.store');
+
+    Route::post('/riwayat-pegawai/{pegawai}/dokumen', [PegawaiController::class, 'storeRiwayatDokumen'])
+        ->name('riwayat.pegawai.dokumen.store');
+
 });
 
 Route::prefix('pegawai')->name('pegawai.')->middleware(['auth','role:pegawai'])->group(function () {
@@ -192,32 +219,29 @@ Route::prefix('pegawai')->name('pegawai.')->middleware(['auth','role:pegawai'])-
     Route::get('/surat/lembur', [PegawaiController::class, 'lembur'])
     ->name('surat.lembur');
 
-    Route::post(
-    '/lembur/store',
-        [SuratController::class, 'storeLembur']
-    )->name('lembur.store');
+    Route::post('/lembur/store',[SuratController::class, 'storeLembur'])
+    ->name('lembur.store');
 
     Route::get('/surat/cuti', [PegawaiController::class, 'cuti'])
     ->name('surat.cuti');
 
-    Route::post('/cuti/store', [CutiController::class, 'storeCuti']
-    )->name('cuti.store');
+    Route::post('/cuti/store', [CutiController::class, 'storeCuti'])
+    ->name('cuti.store');
 
-    Route::post('/cuti/approve/{id}', [CutiController::class, 'approveCuti']
-    )->name('cuti.approve');
+    Route::post('/cuti/approve/{id}', [CutiController::class, 'approveCuti'])
+    ->name('cuti.approve');
 
-    Route::get('/cuti/approval/{id}', [CutiController::class, 'approvalCuti']
-    )->name(
-    'cuti.approval');
+    Route::get('/cuti/approval/{id}', [CutiController::class, 'approvalCuti'])
+    ->name('cuti.approval');
 
-    Route::get('/list-cuti', [CutiController::class, 'listCuti']
-    )->name('list.cuti');
+    Route::get('/list-cuti', [CutiController::class, 'listCuti'])
+    ->name('list.cuti');
 
-    Route::get('/preview-cuti/{id}', [CutiController::class, 'previewCuti']
-    )->name('preview.cuti');
+    Route::get('/preview-cuti/{id}', [CutiController::class, 'previewCuti'])
+    ->name('preview.cuti');
 
-    Route::get('/print-cuti/{id}', [CutiController::class, 'printCuti']
-    )->name('print.cuti');
+    Route::get('/print-cuti/{id}', [CutiController::class, 'printCuti'])
+    ->name('print.cuti');
 
     // ABSENSI PEGAWAI
     Route::get('/absensi', [AbsensiController::class, 'indexPegawai'])

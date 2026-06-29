@@ -2,6 +2,14 @@
 
 @section('content')
 
+@php
+    $totalHadir = $absensis->whereIn('status_masuk', ['hadir', 'terlambat'])->count();
+    $totalTerlambat = $absensis->where('status_masuk', 'terlambat')->count();
+    $totalPulangCepat = $absensis->where('status_pulang', 'pulang_cepat')->count();
+    $totalTidakAbsenPulang = $absensis->filter(fn($item) => !$item->jam_pulang)->count();
+    $totalMenitLembur = $absensis->sum('total_menit_lembur');
+@endphp
+
 <div class="p-6 bg-slate-50 min-h-screen">
 
     <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -10,16 +18,24 @@
             <h1 class="text-3xl font-bold text-slate-800">
                 Detail Absensi Pegawai
             </h1>
+
             <p class="text-slate-500 mt-1">
-                {{ $pegawai->nama }} -
-                {{ \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->translatedFormat('F Y') }}
+                {{ $pegawai->nama }}
+            </p>
+
+            <p class="text-sm text-blue-600 font-semibold mt-1">
+                Periode:
+                {{ \Carbon\Carbon::parse($tanggalMulai)->translatedFormat('d F Y') }}
+                s/d
+                {{ \Carbon\Carbon::parse($tanggalSelesai)->translatedFormat('d F Y') }}
             </p>
         </div>
 
         <a href="{{ route('admin.absensi.rekap', [
-                'bulan' => $bulan,
-                'tahun' => $tahun
-            ]) }}" class="px-5 py-3 rounded-xl bg-slate-800 text-white font-semibold">
+                'tanggal_mulai' => $tanggalMulai,
+                'tanggal_selesai' => $tanggalSelesai
+            ]) }}"
+           class="px-5 py-3 rounded-xl bg-slate-800 text-white font-semibold">
             Kembali
         </a>
 
@@ -45,8 +61,10 @@
 
             <div class="p-4 rounded-2xl bg-slate-50 border">
                 <p class="text-slate-500 text-sm">Periode</p>
-                <p class="font-bold text-slate-800">
-                    {{ \Carbon\Carbon::createFromDate($tahun, $bulan, 1)->translatedFormat('F Y') }}
+                <p class="font-bold text-slate-800 text-sm">
+                    {{ \Carbon\Carbon::parse($tanggalMulai)->format('d/m/Y') }}
+                    s/d
+                    {{ \Carbon\Carbon::parse($tanggalSelesai)->format('d/m/Y') }}
                 </p>
             </div>
 
@@ -57,6 +75,37 @@
                 </p>
             </div>
 
+        </div>
+
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+
+        <div class="bg-white rounded-2xl border p-4">
+            <p class="text-sm text-slate-500">Hadir</p>
+            <p class="text-2xl font-bold text-green-700">{{ $totalHadir }}</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border p-4">
+            <p class="text-sm text-slate-500">Terlambat</p>
+            <p class="text-2xl font-bold text-red-700">{{ $totalTerlambat }}</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border p-4">
+            <p class="text-sm text-slate-500">Pulang Cepat</p>
+            <p class="text-2xl font-bold text-orange-700">{{ $totalPulangCepat }}</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border p-4">
+            <p class="text-sm text-slate-500">Tidak Absen Pulang</p>
+            <p class="text-2xl font-bold text-yellow-700">{{ $totalTidakAbsenPulang }}</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border p-4">
+            <p class="text-sm text-slate-500">Total Lembur</p>
+            <p class="text-lg font-bold text-blue-700">
+                {{ floor($totalMenitLembur / 60) }} Jam {{ $totalMenitLembur % 60 }} Menit
+            </p>
         </div>
 
     </div>
@@ -84,94 +133,100 @@
 
                 <tbody class="divide-y divide-slate-100">
                     @forelse($absensis as $item)
-                    <tr class="hover:bg-slate-50">
-                        <td class="px-4 py-3 font-semibold">
-                            {{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d F Y') }}
-                        </td>
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-4 py-3 font-semibold">
+                                {{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d F Y') }}
+                            </td>
 
-                        <td class="px-4 py-3 text-center">
-                            {{ $item->nama_hari ?? '-' }}
-                        </td>
+                            <td class="px-4 py-3 text-center">
+                                {{ $item->nama_hari ?? '-' }}
+                            </td>
 
-                        <td class="px-4 py-3 text-center">
-                            {{ $item->jam_masuk ?? '-' }}
-                        </td>
+                            <td class="px-4 py-3 text-center">
+                                {{ $item->jam_masuk ?? '-' }}
+                            </td>
 
-                        <td class="px-4 py-3 text-center">
-                            {{ $item->jam_pulang ?? '-' }}
-                        </td>
+                            <td class="px-4 py-3 text-center">
+                                {{ $item->jam_pulang ?? '-' }}
+                            </td>
 
-                        <td class="px-4 py-3 text-center">
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold
+                            <td class="px-4 py-3 text-center">
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold
                                     {{ $item->status_masuk == 'terlambat'
                                         ? 'bg-red-100 text-red-700'
                                         : 'bg-green-100 text-green-700' }}">
-                                {{ ucfirst($item->status_masuk) }}
-                            </span>
-                        </td>
+                                    {{ ucfirst($item->status_masuk ?? '-') }}
+                                </span>
+                            </td>
 
-                        <td class="px-4 py-3 text-center">
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold
-                                    {{ $item->status_pulang == 'pulang_cepat'
-                                        ? 'bg-orange-100 text-orange-700'
-                                        : 'bg-blue-100 text-blue-700' }}">
-                                {{ ucfirst(str_replace('_', ' ', $item->status_pulang)) }}
-                            </span>
-                        </td>
-
-                        <td class="px-4 py-3 text-center">
-                            {{ $item->menit_terlambat }} Menit
-                        </td>
-
-                        <td class="px-4 py-3 text-center">
-                            {{ $item->menit_pulang_cepat }} Menit
-                        </td>
-
-                        <td class="px-4 py-3 text-center font-semibold">
-                            {{ floor($item->total_menit_lembur / 60) }}
-                            Jam
-                            {{ $item->total_menit_lembur % 60 }}
-                            Menit
-                        </td>
-
-                        <td class="px-4 py-3 text-center">
-                            {{ $item->jarak_masuk ?? '-' }} m
-                        </td>
-
-                        <td class="px-4 py-3 text-center">
-                            {{ $item->jarak_pulang ?? '-' }} m
-                        </td>
-
-                        <td class="px-4 py-3 text-center">
-                            <div class="flex justify-center gap-3">
-
-                                @if($item->foto_masuk)
-                                <a href="{{ route('admin.absensi.foto', ['path' => $item->foto_masuk]) }}"
-                                    target="_blank">
-                                    <img src="{{ route('admin.absensi.foto', ['path' => $item->foto_masuk]) }}"
-                                        class="w-14 h-14 rounded-xl object-cover border border-green-300">
-                                </a>
+                            <td class="px-4 py-3 text-center">
+                                @if($item->status_pulang)
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold
+                                        {{ $item->status_pulang == 'pulang_cepat'
+                                            ? 'bg-orange-100 text-orange-700'
+                                            : 'bg-blue-100 text-blue-700' }}">
+                                        {{ ucfirst(str_replace('_', ' ', $item->status_pulang)) }}
+                                    </span>
                                 @else
-                                <span class="text-slate-400">-</span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+                                        Belum Pulang
+                                    </span>
                                 @endif
+                            </td>
 
-                                @if($item->foto_pulang)
-                                <a href="{{ route('admin.absensi.foto', ['path' => $item->foto_pulang]) }}"
-                                    target="_blank">
-                                    <img src="{{ route('admin.absensi.foto', ['path' => $item->foto_pulang]) }}"
-                                        class="w-14 h-14 rounded-xl object-cover border border-red-300">
-                                </a>
-                                @endif
+                            <td class="px-4 py-3 text-center">
+                                {{ $item->menit_terlambat ?? 0 }} Menit
+                            </td>
 
-                            </div>
-                        </td>
-                    </tr>
+                            <td class="px-4 py-3 text-center">
+                                {{ $item->menit_pulang_cepat ?? 0 }} Menit
+                            </td>
+
+                            <td class="px-4 py-3 text-center font-semibold">
+                                {{ floor(($item->total_menit_lembur ?? 0) / 60) }}
+                                Jam
+                                {{ ($item->total_menit_lembur ?? 0) % 60 }}
+                                Menit
+                            </td>
+
+                            <td class="px-4 py-3 text-center">
+                                {{ $item->jarak_masuk ?? '-' }} m
+                            </td>
+
+                            <td class="px-4 py-3 text-center">
+                                {{ $item->jarak_pulang ?? '-' }} m
+                            </td>
+
+                            <td class="px-4 py-3 text-center">
+                                <div class="flex justify-center gap-3">
+
+                                    @if($item->foto_masuk)
+                                        <a href="{{ route('admin.absensi.foto', ['path' => $item->foto_masuk]) }}"
+                                           target="_blank">
+                                            <img src="{{ route('admin.absensi.foto', ['path' => $item->foto_masuk]) }}"
+                                                 class="w-14 h-14 rounded-xl object-cover border border-green-300">
+                                        </a>
+                                    @else
+                                        <span class="text-slate-400">-</span>
+                                    @endif
+
+                                    @if($item->foto_pulang)
+                                        <a href="{{ route('admin.absensi.foto', ['path' => $item->foto_pulang]) }}"
+                                           target="_blank">
+                                            <img src="{{ route('admin.absensi.foto', ['path' => $item->foto_pulang]) }}"
+                                                 class="w-14 h-14 rounded-xl object-cover border border-red-300">
+                                        </a>
+                                    @endif
+
+                                </div>
+                            </td>
+                        </tr>
                     @empty
-                    <tr>
-                        <td colspan="12" class="px-4 py-6 text-center text-slate-500">
-                            Belum ada data absensi pada periode ini.
-                        </td>
-                    </tr>
+                        <tr>
+                            <td colspan="12" class="px-4 py-6 text-center text-slate-500">
+                                Belum ada data absensi pada periode ini.
+                            </td>
+                        </tr>
                     @endforelse
                 </tbody>
 
